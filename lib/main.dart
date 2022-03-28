@@ -6,6 +6,8 @@ import 'package:mynotes/views/register_view.dart';
 import '../firebase_options.dart';
 import 'dart:developer' as d;
 
+import 'views/verify_email_view.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
@@ -15,41 +17,72 @@ void main() {
         primarySwatch: Colors.blue,
       ),
       home: const HomePage(),
+      routes: {
+        RegisterView.routeName: (context) => const RegisterView(),
+        LoginView.routeName: (context) => const LoginView(),
+      },
     ),
   );
 }
 
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
-class HomePage extends StatelessWidget {
-  const HomePage({ Key? key }) : super(key: key);
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late final Future<FirebaseApp> _initializedApp;
+
+  @override
+  void initState() {
+    _initializedApp = Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home Page')
-      ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder: ((context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
+    return FutureBuilder(
+      future: _initializedApp,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.done:
             final user = FirebaseAuth.instance.currentUser;
-              d.log('current user: $user');
-              if(user?.emailVerified ?? false){
-                d.log('You are a verified user');
-              } else {
-                d.log('You need to verify your email first !');
-              }
-              return const Text('Done');
-            default:
-              return const Text('Loading...');
-          }
-        }),
-      ),
+            d.log('current user: $user');
+            if (user == null) {
+              return const LoginView();
+            } else if (user.emailVerified) {
+              d.log('You are a verified user');
+              return Column(
+                children: [
+                  const Text('Done'),
+                  TextButton(
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                    },
+                    child: const Text('sign out'),
+                  ),
+                ],
+              );
+            } else {
+              d.log('You need to verify your email first !');
+              return const VerifyEmailView();
+            }
+          default:
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                CircularProgressIndicator(),
+                Text('Loading...'),
+              ],
+            );
+        }
+      },
     );
   }
 }
+
 
