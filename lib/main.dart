@@ -5,7 +5,7 @@ import 'package:mynotes/views/login_view.dart';
 import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
 import '../firebase_options.dart';
-import 'dart:developer' as d;
+import 'dart:developer' as d show log;
 
 import 'views/verify_email_view.dart';
 
