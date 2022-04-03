@@ -68,42 +68,30 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
-                d.log('$userCredentials');
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   NotesView.routeName,
                   (route) => false,
                 );
               } on FirebaseAuthException catch (e) {
-                d.log(e.code);
                 switch (e.code) {
                   case 'user-not-found':
-                    await showErrorDialog(
-                      context,
-                      'User not found',
-                    );
+                    await showErrorDialog(context, 'User not found');
                     break;
                   case 'wrong-password':
-                    await showErrorDialog(
-                      context,
-                      'Wrong credentials',
-                    );
+                    await showErrorDialog(context, 'Wrong credentials');
                     break;
                   case 'invalid-email':
-                    await showErrorDialog(
-                      context,
-                      'Invalid email',
-                    );
+                    await showErrorDialog(context, 'Invalid email');
                     break;
                   case 'user-disabled':
-                    await showErrorDialog(
-                      context,
-                      'User disabled',
-                    );
+                    await showErrorDialog(context, 'User disabled');
                     break;
                   default:
                     d.log(e.code);
                     break;
                 }
+              } on Exception catch (e) {
+                d.log(e.toString());
               }
             },
             child: const Text('Login'),
