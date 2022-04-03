@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mynotes/utilities/show_error_dialog.dart';
 import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
 import 'dart:developer' as d show log;
@@ -76,10 +77,28 @@ class _LoginViewState extends State<LoginView> {
                 d.log(e.code);
                 switch (e.code) {
                   case 'user-not-found':
-                    d.log('User not found');
+                    await showErrorDialog(
+                      context,
+                      'User not found',
+                    );
                     break;
                   case 'wrong-password':
-                    d.log('Wrong password');
+                    await showErrorDialog(
+                      context,
+                      'Wrong credentials',
+                    );
+                    break;
+                  case 'invalid-email':
+                    await showErrorDialog(
+                      context,
+                      'Invalid email',
+                    );
+                    break;
+                  case 'user-disabled':
+                    await showErrorDialog(
+                      context,
+                      'User disabled',
+                    );
                     break;
                   default:
                     d.log(e.code);
