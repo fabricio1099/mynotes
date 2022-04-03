@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mynotes/views/login_view.dart';
+import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
 import '../firebase_options.dart';
 import 'dart:developer' as d;
@@ -56,17 +57,7 @@ class _HomePageState extends State<HomePage> {
               return const LoginView();
             } else if (user.emailVerified) {
               d.log('You are a verified user');
-              return Column(
-                children: [
-                  const Text('Done'),
-                  TextButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                    },
-                    child: const Text('sign out'),
-                  ),
-                ],
-              );
+              return const NotesView();
             } else {
               d.log('You need to verify your email first !');
               return const VerifyEmailView();
