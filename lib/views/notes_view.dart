@@ -5,6 +5,8 @@ import 'dart:developer' as d show log;
 import 'login_view.dart';
 
 class NotesView extends StatefulWidget {
+  static const routeName = '/notes';
+
   const NotesView({Key? key}) : super(key: key);
 
   @override

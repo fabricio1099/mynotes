@@ -88,7 +88,6 @@ class _RegisterViewState extends State<RegisterView> {
               } on Exception {
                 d.log('something bad happened');
               }
-              // print(userCredential);
             },
             child: const Text('Register'),
           ),
