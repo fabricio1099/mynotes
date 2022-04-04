@@ -5,6 +5,8 @@ import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
 import 'dart:developer' as d show log;
 
+import 'package:mynotes/views/verify_email_view.dart';
+
 class LoginView extends StatefulWidget {
   static const routeName = '/login';
 
@@ -63,15 +65,28 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredentials =
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
                   email: email,
                   password: password,
                 );
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  NotesView.routeName,
-                  (route) => false,
-                );
+                final user = FirebaseAuth.instance.currentUser;
+                if (user?.emailVerified ?? false) {
+                  // user's email is verified
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    NotesView.routeName,
+                    (route) => false,
+                  );
+                } else {
+                  // user's email is not verified
+                  await showErrorDialog(
+                    context,
+                    'You need to verify your email before signing in !',
+                  );
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context).pushNamed(
+                    VerifyEmailView.routeName,
+                  );
+                }
               } on FirebaseAuthException catch (e) {
                 switch (e.code) {
                   case 'user-not-found':
