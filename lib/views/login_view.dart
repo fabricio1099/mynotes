@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mynotes/services/auth/auth_exceptions.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/utilities/show_error_dialog.dart';
 import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
-import 'dart:developer' as d show log;
-
 import 'package:mynotes/views/verify_email_view.dart';
+import 'dart:developer' as d show log;
 
 class LoginView extends StatefulWidget {
   static const routeName = '/login';
@@ -65,48 +65,42 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                AuthService.firebase().signIn(
                   email: email,
                   password: password,
                 );
-                final user = FirebaseAuth.instance.currentUser;
-                if (user?.emailVerified ?? false) {
-                  // user's email is verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    NotesView.routeName,
-                    (route) => false,
-                  );
-                } else {
-                  // user's email is not verified
-                  await showErrorDialog(
-                    context,
-                    'You need to verify your email before signing in !',
-                  );
-                  await FirebaseAuth.instance.signOut();
-                  Navigator.of(context).pushNamed(
-                    VerifyEmailView.routeName,
-                  );
+                final user = AuthService.firebase().currentUSer;
+                d.log('xyz : $user');
+                if (user != null) {
+                  if (user.isEmailVerified) {
+                    // user's email is verified
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      NotesView.routeName,
+                      (route) => false,
+                    );
+                  } else {
+                    // user's email is not verified
+                    d.log('$user');
+                    // await showErrorDialog(
+                    //   context,
+                    //   'You need to verify your email before signing in !',
+                    // );
+                    // await AuthService.firebase().signOut();
+                    Navigator.of(context).pushNamed(
+                      VerifyEmailView.routeName,
+                    );
+                  }
                 }
-              } on FirebaseAuthException catch (e) {
-                switch (e.code) {
-                  case 'user-not-found':
-                    await showErrorDialog(context, 'User not found');
-                    break;
-                  case 'wrong-password':
-                    await showErrorDialog(context, 'Wrong credentials');
-                    break;
-                  case 'invalid-email':
-                    await showErrorDialog(context, 'Invalid email');
-                    break;
-                  case 'user-disabled':
-                    await showErrorDialog(context, 'User disabled');
-                    break;
-                  default:
-                    d.log(e.code);
-                    break;
-                }
-              } on Exception catch (e) {
-                d.log(e.toString());
+              } on UserNotFoundAuthException {
+                await showErrorDialog(context, 'User not found');
+              } on WrongPassswordAuthException {
+                await showErrorDialog(context, 'Wrong credentials');
+              } on InvalidEmailAuthException {
+                await showErrorDialog(context, 'Invalid email');
+              } on UserDisabledAuthException {
+                await showErrorDialog(context, 'User disabled');
+              } on GenericAuthException {
+                await showErrorDialog(context, 'Authentication Error');
               }
             },
             child: const Text('Login'),

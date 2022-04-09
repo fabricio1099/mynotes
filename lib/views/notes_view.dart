@@ -1,5 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mynotes/enums/menu_action.dart';
+import 'package:mynotes/services/auth/auth_exceptions.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:mynotes/utilities/show_error_dialog.dart';
 import 'dart:developer' as d show log;
 
 import 'login_view.dart';
@@ -33,8 +36,15 @@ class _NotesViewState extends State<NotesView> {
               switch (value) {
                 case MenuAction.logout:
                   final shouldSignout = await showSignOutDialog(context);
-                  if(shouldSignout) await FirebaseAuth.instance.signOut();
-                  d.log('$shouldSignout');
+                  if(shouldSignout) {
+                    try {
+                      AuthService.firebase().signOut();
+                    } on UserNotLoggedInAuthException {
+                      await showErrorDialog(context, "You're not signed in!");
+                    } on GenericAuthException {
+                      await showErrorDialog(context, 'Failed to sign out');
+                    }
+                  }
                   Navigator.of(context).pushNamedAndRemoveUntil(LoginView.routeName, (route) => false);
                   break;
                 default:
@@ -83,6 +93,4 @@ Future<bool> showSignOutDialog(BuildContext context) {
   });
 }
 
-enum MenuAction {
-  logout,
-}
+
