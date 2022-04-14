@@ -34,16 +34,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<void>(
       future: AuthService.firebase().initialize(),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             final user = AuthService.firebase().currentUSer;
-            d.log('current user: $user');
             if (user == null) {
               return const LoginView();
             } else if (user.isEmailVerified) {
@@ -66,5 +69,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-

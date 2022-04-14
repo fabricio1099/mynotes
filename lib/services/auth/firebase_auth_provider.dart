@@ -5,12 +5,12 @@ import 'package:mynotes/services/auth/auth_provider.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
+import 'dart:developer' as d show log;
 
 class FirebaseAuthProvider implements AuthProvider {
-  
   @override
-  Future<FirebaseApp> initialize() async {
-    return await Firebase.initializeApp(
+  Future<void> initialize() async {
+    await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
