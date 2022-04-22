@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^1.13.1
   firebase_auth: ^3.3.11
+  sqflite: ^2.0.2+1
+  path_provider: ^2.0.9
+  path: ^1.8.0
 
 dev_dependencies:
   flutter_test:
