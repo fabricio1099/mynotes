@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/enums/menu_action.dart';
+import 'package:mynotes/models/note.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:mynotes/services/crud/notes_service.dart';
 import 'package:mynotes/utilities/show_error_dialog.dart';
 import 'dart:developer' as d show log;
 
@@ -17,6 +19,23 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesViewState extends State<NotesView> {
+  late final NotesService _notesService;
+
+  String get userEmail => AuthService.firebase().currentUSer!.email!;
+
+  @override
+  void initState() {
+    _notesService = NotesService();
+    _notesService.open();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notesService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +55,7 @@ class _NotesViewState extends State<NotesView> {
               switch (value) {
                 case MenuAction.logout:
                   final shouldSignout = await showSignOutDialog(context);
-                  if(shouldSignout) {
+                  if (shouldSignout) {
                     try {
                       AuthService.firebase().signOut();
                     } on UserNotLoggedInAuthException {
@@ -45,7 +64,8 @@ class _NotesViewState extends State<NotesView> {
                       await showErrorDialog(context, 'Failed to sign out');
                     }
                   }
-                  Navigator.of(context).pushNamedAndRemoveUntil(LoginView.routeName, (route) => false);
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      LoginView.routeName, (route) => false);
                   break;
                 default:
                   d.log('default menu action');
@@ -54,12 +74,31 @@ class _NotesViewState extends State<NotesView> {
           )
         ],
       ),
-      body: Center(
-        child: Column(
-          children: const [
-            Text('Done'),
-          ],
-        ),
+      body: FutureBuilder(
+        future: _notesService.getOrCreateUser(email: userEmail),
+        builder: (context, snappshot) {
+          switch (snappshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _notesService.allNotes,
+                builder: (context, snapshot){
+                  switch(snapshot.connectionState){
+                    case ConnectionState.waiting:
+                      return const Text('Waiting for all notes');
+                    case ConnectionState.done:
+                      final notes = (snapshot.data as List<Note>).map((note) => Text(note.text)).toList();
+                      return Column(
+                        children: notes,
+                      );
+                    default:
+                    return const CircularProgressIndicator();
+                  }
+                },
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
+        },
       ),
     );
   }
@@ -92,5 +131,3 @@ Future<bool> showSignOutDialog(BuildContext context) {
     return value ?? false;
   });
 }
-
-
