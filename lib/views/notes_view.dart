@@ -5,6 +5,7 @@ import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/crud/notes_service.dart';
 import 'package:mynotes/utilities/show_error_dialog.dart';
+import 'package:mynotes/views/notes/new_notes_view.dart';
 import 'dart:developer' as d show log;
 
 import 'login_view.dart';
@@ -42,10 +43,16 @@ class _NotesViewState extends State<NotesView> {
       appBar: AppBar(
         title: const Text('Notes'),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(NewNotesView.routeName);
+            },
+            icon: const Icon(Icons.add),
+          ),
           PopupMenuButton(
             itemBuilder: (_) {
-              return const [
-                PopupMenuItem(
+              return [
+                const PopupMenuItem(
                   child: Text('Sign out'),
                   value: MenuAction.logout,
                 ),
@@ -81,17 +88,19 @@ class _NotesViewState extends State<NotesView> {
             case ConnectionState.done:
               return StreamBuilder(
                 stream: _notesService.allNotes,
-                builder: (context, snapshot){
-                  switch(snapshot.connectionState){
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                       return const Text('Waiting for all notes');
                     case ConnectionState.done:
-                      final notes = (snapshot.data as List<Note>).map((note) => Text(note.text)).toList();
+                      final notes = (snapshot.data as List<Note>)
+                          .map((note) => Text(note.text))
+                          .toList();
                       return Column(
                         children: notes,
                       );
                     default:
-                    return const CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                   }
                 },
               );
