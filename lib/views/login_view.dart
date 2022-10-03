@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
-import 'package:mynotes/utilities/show_error_dialog.dart';
+import 'package:mynotes/utilities/dialogs/error_dialog.dart';
 import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
 import 'package:mynotes/views/verify_email_view.dart';
@@ -72,6 +72,7 @@ class _LoginViewState extends State<LoginView> {
                 final user = AuthService.firebase().currentUSer;
                 d.log('xyz : $user');
                 if (user != null) {
+                  d.log('user not nullll');
                   if (user.isEmailVerified) {
                     // user's email is verified
                     Navigator.of(context).pushNamedAndRemoveUntil(
