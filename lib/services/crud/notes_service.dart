@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:mynotes/extensions/list/filter.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart'
     show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
@@ -13,7 +14,7 @@ class NotesService {
 
   List<DatabaseNote> _notes = [];
 
-
+  DatabaseUser? _currentUser;
 
   static final NotesService _shared = NotesService._sharedInstance();
   NotesService._sharedInstance() {
@@ -25,10 +26,20 @@ class NotesService {
   }
   factory NotesService() => _shared;
 
-
   late final StreamController<List<DatabaseNote>> _notesStreamController;
 
-  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
+  Stream<List<DatabaseNote>> get allNotes {
+    return _notesStreamController.stream.filter(
+      (note) {
+        final currentUser = _currentUser;
+        if (currentUser != null) {
+          return note.userId == currentUser.id;
+        } else {
+          throw UserShouldBeSetBeforeReadingAllNotes();
+        }
+      },
+    );
+  }
 
   Future<void> _cacheNotes() async {
     try {
@@ -87,12 +98,21 @@ class NotesService {
     }
   }
 
-  Future<User> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     try {
       final user = await getUser(email: email);
+      if (setAsCurrentUser) {
+        _currentUser = user;
+      }
       return user;
     } on CouldNotFindUserException {
       final createdUser = await createUser(email: email);
+      if (setAsCurrentUser) {
+        _currentUser = createdUser;
+      }
       return createdUser;
     } catch (e) {
       rethrow;
@@ -103,7 +123,7 @@ class NotesService {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
-      User.tableName,
+      DatabaseUser.tableName,
       where: 'email = ?',
       whereArgs: [email.toLowerCase()],
     );
@@ -112,11 +132,11 @@ class NotesService {
     }
   }
 
-  Future<User> createUser({required String email}) async {
+  Future<DatabaseUser> createUser({required String email}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
-      User.tableName,
+      DatabaseUser.tableName,
       limit: 1,
       where: 'email = ?',
       whereArgs: [email.toLowerCase()],
@@ -126,22 +146,22 @@ class NotesService {
       throw UserAlreadyExistsException();
     }
 
-    final userId = await db.insert(User.tableName, {
+    final userId = await db.insert(DatabaseUser.tableName, {
       emailColumn: email.toLowerCase(),
     });
 
-    return User(
+    return DatabaseUser(
       id: userId,
       email: email,
     );
   }
 
-  Future<User> getUser({required String email}) async {
+  Future<DatabaseUser> getUser({required String email}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
     final results = await db.query(
-      User.tableName,
+      DatabaseUser.tableName,
       limit: 1,
       where: 'email = ?',
       whereArgs: [email.toLowerCase()],
@@ -150,11 +170,11 @@ class NotesService {
     if (results.isEmpty) {
       throw CouldNotFindUserException();
     } else {
-      return User.fromDbRow(results.first);
+      return DatabaseUser.fromDbRow(results.first);
     }
   }
 
-  Future<DatabaseNote> createNote({required User owner}) async {
+  Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     //make sure owner exists in the database with the correct id
@@ -253,7 +273,9 @@ class NotesService {
   }
 
   Future<DatabaseNote> updateNote(
-      {required DatabaseNote note, required String text, String title = ''}) async {
+      {required DatabaseNote note,
+      required String text,
+      String title = ''}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
