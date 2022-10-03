@@ -11,15 +11,24 @@ import 'dart:developer' as d show log;
 class NotesService {
   Database? _db;
 
-  List<Note> _notes = [];
+  List<DatabaseNote> _notes = [];
 
-  late final _notesStreamController = StreamController<List<Note>>.broadcast();
 
-  NotesService._sharedInstance();
+
   static final NotesService _shared = NotesService._sharedInstance();
+  NotesService._sharedInstance() {
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_notes);
+      },
+    );
+  }
   factory NotesService() => _shared;
 
-  Stream<List<Note>> get allNotes => _notesStreamController.stream;
+
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
+
+  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
 
   Future<void> _cacheNotes() async {
     try {
@@ -145,7 +154,7 @@ class NotesService {
     }
   }
 
-  Future<Note> createNote({required User owner}) async {
+  Future<DatabaseNote> createNote({required User owner}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     //make sure owner exists in the database with the correct id
@@ -166,11 +175,11 @@ class NotesService {
     };
 
     final noteId = await db.insert(
-      Note.tableName,
+      DatabaseNote.tableName,
       values,
     );
 
-    final note = Note(
+    final note = DatabaseNote(
       id: noteId,
       userId: owner.id,
       title: title,
@@ -188,7 +197,7 @@ class NotesService {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
-      Note.tableName,
+      DatabaseNote.tableName,
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -203,17 +212,17 @@ class NotesService {
   Future<int> deleteAllNotes() async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    final numberOfDeletions = await db.delete(Note.tableName);
+    final numberOfDeletions = await db.delete(DatabaseNote.tableName);
     _notes = [];
     _notesStreamController.add(_notes);
     return numberOfDeletions;
   }
 
-  Future<Note> getNote(int id) async {
+  Future<DatabaseNote> getNote(int id) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
-      Note.tableName,
+      DatabaseNote.tableName,
       where: 'id = ?',
       whereArgs: [id],
       limit: 1,
@@ -222,7 +231,7 @@ class NotesService {
     if (results.isEmpty) {
       throw CouldNotFindNoteException();
     } else {
-      final note = Note.fromDbRow(results.first);
+      final note = DatabaseNote.fromDbRow(results.first);
       _notes.removeWhere((note) => note.id == id);
       _notes.add(note);
       _notesStreamController.add(_notes);
@@ -230,21 +239,21 @@ class NotesService {
     }
   }
 
-  Future<Iterable<Note>> getAllNotes() async {
+  Future<Iterable<DatabaseNote>> getAllNotes() async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    final results = await db.query(Note.tableName);
+    final results = await db.query(DatabaseNote.tableName);
 
     if (results.isEmpty) {
       throw CouldNotFindNoteException();
     } else {
-      final notes = results.map((noteRow) => Note.fromDbRow(noteRow));
+      final notes = results.map((noteRow) => DatabaseNote.fromDbRow(noteRow));
       return notes;
     }
   }
 
-  Future<Note> updateNote(
-      {required Note note, required String text, String title = ''}) async {
+  Future<DatabaseNote> updateNote(
+      {required DatabaseNote note, required String text, String title = ''}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
@@ -259,7 +268,7 @@ class NotesService {
 
     //update note in db
     final updatesCount = await db.update(
-      Note.tableName,
+      DatabaseNote.tableName,
       values,
       where: 'id = ?',
       whereArgs: [note.id],

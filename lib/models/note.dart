@@ -7,7 +7,7 @@ const textColumn = 'text';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 
 @immutable
-class Note {
+class DatabaseNote {
   static const tableName = 'note';
 
   final int id;
@@ -16,7 +16,7 @@ class Note {
   final String text;
   final bool isSyncedWithCloud;
 
-  const Note({
+  const DatabaseNote({
     required this.id,
     required this.userId,
     required this.title,
@@ -25,7 +25,7 @@ class Note {
   });
 
   //representation type of a Row in database -> Map<String, Object?>
-  Note.fromDbRow(Map<String, Object?> map)
+  DatabaseNote.fromDbRow(Map<String, Object?> map)
       : id = map[idColumn] as int,
         userId = map[userIdColumn] as int,
         title = map[titleColumn] as String,
@@ -38,7 +38,7 @@ class Note {
       'Note, ID = $id, userId = $userId, title = $title, isSyncedWithCloud = $isSyncedWithCloud, text = $text';
 
   @override
-  bool operator ==(covariant Note other) => other.id == id;
+  bool operator ==(covariant DatabaseNote other) => other.id == id;
 
   @override
   int get hashCode => id.hashCode;
