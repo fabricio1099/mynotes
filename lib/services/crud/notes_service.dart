@@ -6,13 +6,14 @@ import 'package:path/path.dart' show join;
 import 'package:mynotes/models/user.dart' hide idColumn;
 import 'package:mynotes/models/note.dart' hide idColumn;
 import 'package:mynotes/services/crud/crud_exceptions.dart';
+import 'dart:developer' as d show log;
 
 class NotesService {
   Database? _db;
 
   List<Note> _notes = [];
 
-  final _notesStreamController = StreamController<List<Note>>.broadcast();
+  late final _notesStreamController = StreamController<List<Note>>.broadcast();
 
   NotesService._sharedInstance();
   static final NotesService _shared = NotesService._sharedInstance();
@@ -21,9 +22,13 @@ class NotesService {
   Stream<List<Note>> get allNotes => _notesStreamController.stream;
 
   Future<void> _cacheNotes() async {
-    final allNotes = await getAllNotes();
-    _notes = allNotes.toList();
-    _notesStreamController.add(_notes);
+    try {
+      final allNotes = await getAllNotes();
+      _notes = allNotes.toList();
+      _notesStreamController.add(_notes);
+    } catch (e) {
+      d.log('could not find any notes');
+    }
   }
 
   Future<void> open() async {
@@ -47,7 +52,7 @@ class NotesService {
   }
 
   Future<void> _ensureDbIsOpen() async {
-    try{
+    try {
       await open();
     } on DatabaseAlreadyOpenException {
       // empty
@@ -74,13 +79,13 @@ class NotesService {
   }
 
   Future<User> getOrCreateUser({required String email}) async {
-    try{
+    try {
       final user = await getUser(email: email);
       return user;
     } on CouldNotFindUserException {
       final createdUser = await createUser(email: email);
       return createdUser;
-    } catch(e){
+    } catch (e) {
       rethrow;
     }
   }
@@ -238,7 +243,8 @@ class NotesService {
     }
   }
 
-  Future<Note> updateNote({required Note note, required String text, String title = ''}) async {
+  Future<Note> updateNote(
+      {required Note note, required String text, String title = ''}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
