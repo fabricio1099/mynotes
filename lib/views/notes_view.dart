@@ -7,7 +7,7 @@ import 'package:mynotes/services/crud/crud_exceptions.dart';
 import 'package:mynotes/services/crud/notes_service.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
 import 'package:mynotes/utilities/dialogs/signout_dialog.dart';
-import 'package:mynotes/views/notes/new_notes_view.dart';
+import 'package:mynotes/views/notes/create_update_note_view.dart';
 import 'package:mynotes/views/notes/notes_list_view.dart';
 import 'dart:developer' as d show log;
 
@@ -46,7 +46,7 @@ class _NotesViewState extends State<NotesView> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(NewNotesView.routeName);
+              Navigator.of(context).pushNamed(CreateUpdateNoteView.routeName);
             },
             icon: const Icon(Icons.add),
           ),
@@ -101,6 +101,12 @@ class _NotesViewState extends State<NotesView> {
                           notes: allNotes,
                           onDeleteNote: (note) async {
                             await _notesService.deleteNote(id: note.id);
+                          },
+                          onTap: (note) {
+                            Navigator.of(context).pushNamed(
+                              CreateUpdateNoteView.routeName,
+                              arguments: note,
+                            );
                           },
                         );
                       } else {
