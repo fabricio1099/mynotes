@@ -27,7 +27,7 @@ void main() {
     });
 
     test('User should be null after initialization', () {
-      expect(provider.currentUSer, null);
+      expect(provider.currentUser, null);
     });
 
     test(
@@ -62,7 +62,7 @@ void main() {
           email: 'someone@email.com',
           password: 'someonepassword',
         );
-        expect(provider.currentUSer, user);
+        expect(provider.currentUser, user);
         expect(user.isEmailVerified, false);
       },
     );
@@ -71,7 +71,7 @@ void main() {
       'Signed in user shoudld be able to get verified',
       () {
         provider.sendEmailVerification();
-        final user = provider.currentUSer;
+        final user = provider.currentUser;
         expect(user, isNotNull);
         expect(user!.isEmailVerified, true);
       },
@@ -85,7 +85,7 @@ void main() {
           email: 'email',
           password: 'password',
         );
-        expect(provider.currentUSer, isNotNull);
+        expect(provider.currentUser, isNotNull);
       },
     );
   });
@@ -109,7 +109,7 @@ class MockAuthProvider implements AuthProvider {
   }
 
   @override
-  AuthUser? get currentUSer => _user;
+  AuthUser? get currentUser => _user;
 
   @override
   Future<void> initialize() async {
@@ -122,7 +122,7 @@ class MockAuthProvider implements AuthProvider {
   Future<void> sendEmailVerification() async {
     if (!isInitialized) throw NotInitializedException();
     if (_user == null) throw UserNotLoggedInAuthException();
-    const newUser = AuthUser(isEmailVerified: true, email: 'foo@bar.baz');
+    const newUser = AuthUser(id: 'my_id', isEmailVerified: true, email: 'foo@bar.baz');
     _user = newUser;
   }
 
@@ -131,7 +131,7 @@ class MockAuthProvider implements AuthProvider {
     if (!isInitialized) throw NotInitializedException();
     if (email == 'foo@bar.com') throw UserNotFoundAuthException();
     if (password == 'foobar') throw WrongPassswordAuthException();
-    const user = AuthUser(isEmailVerified: false, email: 'foo@bar.baz');
+    const user = AuthUser(id: 'my_id', isEmailVerified: false, email: 'foo@bar.baz');
     _user = user;
     return Future.value(user);
   }

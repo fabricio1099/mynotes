@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
-            final user = AuthService.firebase().currentUSer;
+            final user = AuthService.firebase().currentUser;
             if (user == null) {
               return const LoginView();
             } else if (user.isEmailVerified) {

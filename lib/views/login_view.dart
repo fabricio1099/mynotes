@@ -69,7 +69,7 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
-                final user = AuthService.firebase().currentUSer;
+                final user = AuthService.firebase().currentUser;
                 d.log('xyz : $user');
                 if (user != null) {
                   d.log('user not nullll');

@@ -3,7 +3,7 @@ import 'package:mynotes/services/auth/auth_user.dart';
 abstract class AuthProvider {
   Future<void> initialize();
 
-  AuthUser? get currentUSer;
+  AuthUser? get currentUser;
 
   Future<AuthUser> signIn({required String email, required String password});
 
