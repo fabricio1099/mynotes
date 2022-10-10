@@ -3,8 +3,8 @@ import 'package:mynotes/enums/menu_action.dart';
 import 'package:mynotes/models/note.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
-import 'package:mynotes/services/crud/crud_exceptions.dart';
-import 'package:mynotes/services/crud/notes_service.dart';
+import 'package:mynotes/services/cloud/cloud_note.dart';
+import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
 import 'package:mynotes/utilities/dialogs/signout_dialog.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
@@ -23,18 +23,13 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesViewState extends State<NotesView> {
-  late final NotesService _notesService;
+  late final FirebaseCloudStorageService _notesService;
 
-  String get userEmail => AuthService.firebase().currentUser!.email;
+  String get userId => AuthService.firebase().currentUser!.id;
 
   @override
   void initState() {
-    _notesService = NotesService();
-    try {
-      _notesService.open();
-    } on DatabaseAlreadyOpenException {
-      d.log('Database already opened');
-    }
+    _notesService = FirebaseCloudStorageService();
     super.initState();
   }
 
@@ -84,45 +79,35 @@ class _NotesViewState extends State<NotesView> {
           )
         ],
       ),
-      body: FutureBuilder(
-        future: _notesService.getOrCreateUser(email: userEmail),
+      body: StreamBuilder(
+        stream: _notesService.allNotes(ownerUserId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              if (snapshot.hasData) {
+                final allNotes = snapshot.data as Iterable<CloudNote>;
+                return NotesListView(
+                  notes: allNotes,
+                  onDeleteNote: (note) async {
+                    await _notesService.deleteNote(documentId: note.documentId);
+                  },
+                  onTap: (note) {
+                    Navigator.of(context).pushNamed(
+                      CreateUpdateNoteView.routeName,
+                      arguments: note,
+                    );
+                  },
+                );
+              } else {
+                return const CircularProgressIndicator();
+              }
             case ConnectionState.done:
-              return StreamBuilder(
-                stream: _notesService.allNotes,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      if (snapshot.hasData) {
-                        final allNotes = snapshot.data as List<DatabaseNote>;
-                        return NotesListView(
-                          notes: allNotes,
-                          onDeleteNote: (note) async {
-                            await _notesService.deleteNote(id: note.id);
-                          },
-                          onTap: (note) {
-                            Navigator.of(context).pushNamed(
-                              CreateUpdateNoteView.routeName,
-                              arguments: note,
-                            );
-                          },
-                        );
-                      } else {
-                        return const CircularProgressIndicator();
-                      }
-                    case ConnectionState.done:
-                      final notes = (snapshot.data as List<DatabaseNote>)
-                          .map((note) => Text(note.text))
-                          .toList();
-                      return Column(
-                        children: notes,
-                      );
-                    default:
-                      return const CircularProgressIndicator();
-                  }
-                },
+              final notes = (snapshot.data as List<DatabaseNote>)
+                  .map((note) => Text(note.text))
+                  .toList();
+              return Column(
+                children: notes,
               );
             default:
               return const CircularProgressIndicator();
