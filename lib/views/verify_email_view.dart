@@ -31,7 +31,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
             },
           ),
           TextButton(
-            child: const Text('Restart'),
+            // Widget: const Text('Restart'),
             onPressed: () async {
               AuthService.firebase().signOut();
               Navigator.of(context).pushNamedAndRemoveUntil(
@@ -39,6 +39,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 (route) => false,
               );
             },
+            child: const Text('Restart'),
           ),
         ],
       ),
