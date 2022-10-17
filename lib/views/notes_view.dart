@@ -52,7 +52,7 @@ class _NotesViewState extends State<NotesView> {
             itemBuilder: (_) {
               return [
                 const PopupMenuItem(
-                  child: Text('Sign out'),
+                  child: Text('Log Out'),
                   value: MenuAction.logout,
                 ),
               ];
@@ -60,16 +60,16 @@ class _NotesViewState extends State<NotesView> {
             onSelected: (value) async {
               switch (value) {
                 case MenuAction.logout:
-                  final shouldSignout = await showSignOutDialog(context);
-                  if (shouldSignout) {
+                  final shouldLogout = await showLogOutDialog(context);
+                  if (shouldLogout) {
                     try {
                       context.read<AuthBloc>().add(
                             const AuthEventLogOut(),
                           );
                     } on UserNotLoggedInAuthException {
-                      await showErrorDialog(context, "You're not signed in!");
+                      await showErrorDialog(context, "You're not logged in!");
                     } on GenericAuthException {
-                      await showErrorDialog(context, 'Failed to sign out');
+                      await showErrorDialog(context, 'Failed to log out');
                     }
                   }
                   break;
