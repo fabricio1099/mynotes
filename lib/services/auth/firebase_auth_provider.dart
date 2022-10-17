@@ -70,7 +70,7 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> signIn({
+  Future<AuthUser> logIn({
     required String email,
     required String password,
   }) async {
@@ -106,7 +106,7 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<void> signOut() async {
+  Future<void> logOut() async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {

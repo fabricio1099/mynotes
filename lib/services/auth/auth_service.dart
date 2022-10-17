@@ -34,15 +34,15 @@ class AuthService implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> signIn({
+  Future<AuthUser> logIn({
     required String email,
     required String password,
   }) {
-    return provider.signIn(email: email, password: password);
+    return provider.logIn(email: email, password: password);
   }
 
   @override
-  Future<void> signOut() {
-    return provider.signOut();
+  Future<void> logOut() {
+    return provider.logOut();
   }
 }
