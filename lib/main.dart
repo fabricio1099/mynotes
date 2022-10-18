@@ -8,7 +8,6 @@ import 'package:mynotes/views/login_view.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
 import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
-
 import 'views/verify_email_view.dart';
 
 void main() {
@@ -24,10 +23,6 @@ void main() {
         child: const HomePage(),
       ),
       routes: {
-        RegisterView.routeName: (context) => const RegisterView(),
-        LoginView.routeName: (context) => const LoginView(),
-        NotesView.routeName: (context) => const NotesView(),
-        VerifyEmailView.routeName: (context) => const VerifyEmailView(),
         CreateUpdateNoteView.routeName: (context) =>
             const CreateUpdateNoteView(),
       },
@@ -59,8 +54,12 @@ class _HomePageState extends State<HomePage> {
           return const VerifyEmailView();
         } else if (state is AuthStateLoggedOut) {
           return const LoginView();
+        } else if (state is AuthStateRegistering) {
+          return const RegisterView();
         } else {
-          return const Scaffold(body: CircularProgressIndicator(),);
+          return const Scaffold(
+            body: CircularProgressIndicator(),
+          );
         }
       },
     );
