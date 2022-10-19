@@ -41,17 +41,6 @@ class _LoginViewState extends State<LoginView> {
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
           final exception = state.exception;
-          final closeDialog = _closeDialogHandle;
-
-          if(!state.isLoading && closeDialog != null) {
-            closeDialog();
-            _closeDialogHandle = null;
-          } else  if(state.isLoading && closeDialog == null) {
-            _closeDialogHandle = showLoadingDialog(
-              context: context,
-              text: 'Loading...',
-            );
-          }
 
           // if (exception is UserNotFoundAuthException) {
           //   await showErrorDialog(context, 'User not found');
