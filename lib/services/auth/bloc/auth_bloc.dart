@@ -39,6 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(const AuthStateLoggedOut(
             exception: null,
             isLoading: false,
+            showPassword: false,
           ));
         } else if (!user.isEmailVerified) {
           emit(const AuthStateNeedsVerification(
@@ -60,6 +61,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           exception: null,
           isLoading: true,
           loadingText: 'Please wait while I log you in',
+          showPassword: false,
         ));
         final email = event.email;
         final password = event.password;
@@ -72,6 +74,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(const AuthStateLoggedOut(
             exception: null,
             isLoading: false,
+            showPassword: false,
           ));
 
           if (!user.isEmailVerified) {
@@ -88,6 +91,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(AuthStateLoggedOut(
             exception: e,
             isLoading: false,
+            showPassword: false,
           ));
         }
       }),
@@ -101,11 +105,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(const AuthStateLoggedOut(
             exception: null,
             isLoading: false,
+            showPassword: false,
           ));
         } on Exception catch (e) {
           emit(AuthStateLoggedOut(
             exception: e,
             isLoading: false,
+            showPassword: false,
           ));
         }
       }),
@@ -151,7 +157,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     on<AuthEventShouldRegister>((event, emit) {
-      emit(const AuthStateRegistering(exception: null, isLoading: false,));
+      emit(const AuthStateRegistering(
+        exception: null,
+        isLoading: false,
+      ));
+    });
+
+    on<AuthEventLoginShowPassword>((event, emit) {
+      final showPassword = event.showPassword;
+      emit(AuthStateLoggedOut(
+        exception: null,
+        isLoading: false,
+        showPassword: showPassword,
+      ));
     });
   }
 }
