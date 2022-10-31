@@ -33,18 +33,17 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     );
   }
 
-  // Why use this instead of adding the listeners in the initState function 
+  // Why use this instead of adding the listeners in the initState function
   // and removing it in the dispose function ?
-  void _setupTextControllerListener(){
+  void _setupTextControllerListener() {
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
   }
 
   Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
-
     final widgetNote = context.getArgument<CloudNote>();
 
-    if(widgetNote != null) {
+    if (widgetNote != null) {
       _note = widgetNote;
       _textController.text = widgetNote.text;
       return widgetNote;
@@ -55,7 +54,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       return existingNote;
     }
     final currentUser = AuthService.firebase().currentUser!;
-    final newNote = await _notesService.createNewNote(ownerUserId: currentUser.id);
+    final newNote =
+        await _notesService.createNewNote(ownerUserId: currentUser.id);
     _note = newNote;
     return newNote;
   }
@@ -99,22 +99,19 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('New note'),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final text = _textController.text;
-              if(_note == null || text.isEmpty) {
-                await showCannotShareEmptyNoteDialog(context);
-              } else {
-                Share.share(text);
-              }
-            },
-            icon: const Icon(Icons.share),
-          )
-        ]
-      ),
+      appBar: AppBar(title: const Text('New note'), actions: [
+        IconButton(
+          onPressed: () async {
+            final text = _textController.text;
+            if (_note == null || text.isEmpty) {
+              await showCannotShareEmptyNoteDialog(context);
+            } else {
+              Share.share(text);
+            }
+          },
+          icon: const Icon(Icons.share),
+        )
+      ]),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -124,13 +121,31 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   _setupTextControllerListener();
-                  return TextField(
-                    controller: _textController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      hintText: 'Start typing your note...',
-                    ),
+                  return Column(
+                    children: [
+                      const TextField(
+                        autofocus: true,
+                        style: TextStyle(
+                          fontSize: 25,
+                        ),
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Title',
+                            hintStyle: TextStyle(
+                              fontSize: 25,
+                            )),
+                      ),
+                      TextField(
+                        controller: _textController,
+                        autofocus: true,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Note',
+                        ),
+                      ),
+                    ],
                   );
                 default:
                   return const CircularProgressIndicator();
