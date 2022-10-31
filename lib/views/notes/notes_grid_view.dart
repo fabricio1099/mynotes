@@ -40,7 +40,6 @@ class _NotesGridViewState extends State<NotesGridView> {
           child: Dismissible(
             key: ObjectKey(note),
             onDismissed: (direction) async {
-              // deleteItem(index, item);
               deletedNote = note;
               final shouldDelete = await showDeleteDialog(context);
               if (shouldDelete) {
@@ -95,33 +94,6 @@ class _NotesGridViewState extends State<NotesGridView> {
         );
       },
     );
-
-    // return ListView.builder(
-    //   itemCount: notes.length,
-    //   itemBuilder: (context, index) {
-    //     final note = notes.elementAt(index);
-    //     return ListTile(
-    //       title: Text(
-    //         note.text,
-    //         maxLines: 1,
-    //         softWrap: true,
-    //         overflow: TextOverflow.ellipsis,
-    //       ),
-    //       trailing: IconButton(
-    //         onPressed: () async {
-    //           final shouldDelete = await showDeleteDialog(context);
-    //           if (shouldDelete) {
-    //             onDeleteNote(note);
-    //           }
-    //         },
-    //         icon: const Icon(Icons.delete),
-    //       ),
-    //       onTap: () {
-    //         onTap(note);
-    //       },
-    //     );
-    //   },
-    // );
   }
 }
 

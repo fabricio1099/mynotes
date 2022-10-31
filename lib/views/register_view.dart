@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
+import 'package:mynotes/utilities/widgets/custom_text_input_field.dart';
 import '../services/auth/bloc/auth_bloc.dart';
 import '../services/auth/bloc/auth_state.dart';
 
@@ -56,50 +57,91 @@ class _RegisterViewState extends State<RegisterView> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Register'),
-        ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Enter your email and password to create your account!'),
-                TextField(
-                  controller: _email,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  autofocus: true,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter your email here',
-                  ),
-                ),
-                TextField(
-                  controller: _password,
-                  obscureText: true,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter your password here',
-                  ),
-                ),
-                Center(
+          child: LayoutBuilder(
+            builder: (context, constraint) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                child: IntrinsicHeight(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      TextButton(
-                        onPressed: () async {
-                          final email = _email.text;
-                          final password = _password.text;
-                          context
-                              .read<AuthBloc>()
-                              .add(AuthEventRegister(email, password));
-                        },
-                        child: const Text('Register'),
+                      const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text(
+                            "MyNotes",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 36.0,
+                            ),
+                          ),
+                          SizedBox(width: 10,),
+                          SizedBox(
+                            height: 70,
+                            width: 70,
+                            child: Image(
+                              image: AssetImage(('assets/icon/icon.png')),
+                            ),
+                          ),
+                        ],
                       ),
+                      const Spacer(),
+                      const Text(
+                        'Here you can create your account',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          // fontWeight: FontWeight.w400,
+                          fontSize: 17.0,
+                        ),
+                      ),
+                      const Spacer(),
+                      CustomTextInputField(
+                        controller: _email,
+                        isEmail: true,
+                        emailHint: 'Email',
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextInputField(
+                        controller: _password,
+                        isPassword: true,
+                        passwordHint: 'Password',
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.redAccent,
+                        ),
+                        child: TextButton(
+                          onPressed: () async {
+                            final email = _email.text;
+                            final password = _password.text;
+                            context
+                                .read<AuthBloc>()
+                                .add(AuthEventRegister(email, password));
+                          },
+                          child: const Text(
+                            'Create an account',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
                       TextButton(
-                        child: const Text('Already registered? Login here!'),
+                        style: TextButton.styleFrom(
+                          splashFactory: NoSplash.splashFactory,
+                        ),
+                        child: const Text(
+                          'Already registered? Login here!',
+                          textAlign: TextAlign.center,
+                        ),
                         onPressed: () {
                           context.read<AuthBloc>().add(const AuthEventLogOut());
                         },
@@ -107,7 +149,7 @@ class _RegisterViewState extends State<RegisterView> {
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
