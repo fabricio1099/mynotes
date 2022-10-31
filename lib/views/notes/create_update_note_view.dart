@@ -19,25 +19,29 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   CloudNote? _note;
   late final FirebaseCloudStorageService _notesService;
   late final TextEditingController _textController;
+  late final TextEditingController _titleController;
 
-  void _textControllerListener() async {
+  void _noteControllerListener() async {
     final note = _note;
     if (note == null) {
       return;
     }
     final text = _textController.text;
+    final title = _titleController.text;
     await _notesService.updateNote(
       documentId: note.documentId,
       text: text,
-      title: '',
+      title: title,
     );
   }
 
   // Why use this instead of adding the listeners in the initState function
   // and removing it in the dispose function ?
-  void _setupTextControllerListener() {
-    _textController.removeListener(_textControllerListener);
-    _textController.addListener(_textControllerListener);
+  void _setupNoteControllerListener() {
+    _textController.removeListener(_noteControllerListener);
+    _titleController.removeListener(_noteControllerListener);
+    _textController.addListener(_noteControllerListener);
+    _titleController.addListener(_noteControllerListener);
   }
 
   Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
@@ -46,6 +50,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     if (widgetNote != null) {
       _note = widgetNote;
       _textController.text = widgetNote.text;
+      _titleController.text = widgetNote.title;
       return widgetNote;
     }
 
@@ -60,21 +65,24 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     return newNote;
   }
 
-  void _deleteNoteIfTextIsEmpty() {
+  void _deleteNoteIfTextAndTitleAreEmpty() {
     final note = _note;
-    if (_textController.text.isEmpty && note != null) {
+    if (_textController.text.isEmpty &&
+        _titleController.text.isEmpty &&
+        note != null) {
       _notesService.deleteNote(documentId: note.documentId);
     }
   }
 
-  void _saveNoteIfTextNotEmpty() async {
+  void _saveNoteIfTextOrTitleNotEmpty() async {
     final note = _note;
     final text = _textController.text;
-    if (note != null && text.isNotEmpty) {
+    final title = _titleController.text;
+    if (note != null && (text.isNotEmpty || title.isNotEmpty)) {
       await _notesService.updateNote(
         documentId: note.documentId,
         text: text,
-        title: '',
+        title: title,
       );
     }
   }
@@ -83,14 +91,15 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   void initState() {
     _notesService = FirebaseCloudStorageService();
     _textController = TextEditingController();
+    _titleController = TextEditingController();
     // _textController.addListener(_textControllerListener);
     super.initState();
   }
 
   @override
   void dispose() {
-    _deleteNoteIfTextIsEmpty();
-    _saveNoteIfTextNotEmpty();
+    _deleteNoteIfTextAndTitleAreEmpty();
+    _saveNoteIfTextOrTitleNotEmpty();
     // _textController.removeListener(_textControllerListener);
     _textController.dispose();
     super.dispose();
@@ -99,19 +108,27 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New note'), actions: [
-        IconButton(
-          onPressed: () async {
-            final text = _textController.text;
-            if (_note == null || text.isEmpty) {
-              await showCannotShareEmptyNoteDialog(context);
-            } else {
-              Share.share(text);
-            }
-          },
-          icon: const Icon(Icons.share),
-        )
-      ]),
+      appBar: AppBar(
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+          size: 17,
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final text = _textController.text;
+              if (_note == null || text.isEmpty) {
+                await showCannotShareEmptyNoteDialog(context);
+              } else {
+                Share.share(text);
+              }
+            },
+            icon: const Icon(Icons.share),
+          )
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -120,15 +137,17 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
-                  _setupTextControllerListener();
+                  final text = _textController.text;
+                  final title = _titleController.text;
+                  _setupNoteControllerListener();
                   return Column(
                     children: [
-                      const TextField(
-                        autofocus: true,
-                        style: TextStyle(
+                      TextField(
+                        controller: _titleController,
+                        style: const TextStyle(
                           fontSize: 25,
                         ),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Title',
                             hintStyle: TextStyle(
@@ -137,7 +156,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                       ),
                       TextField(
                         controller: _textController,
-                        autofocus: true,
+                        autofocus: text.isEmpty && title.isEmpty,
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                         decoration: const InputDecoration(

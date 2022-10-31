@@ -44,25 +44,29 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(
-              color: Colors.white,
-              width: 0.1,
+        floatingActionButton: SizedBox(
+          width: kAppBarHeight,
+          height: kAppBarHeight,
+          child: FloatingActionButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(
+                color: Colors.white,
+                width: 0.1,
+              ),
             ),
+            onPressed: () {
+              Navigator.of(context).pushNamed(CreateUpdateNoteView.routeName);
+            },
+            backgroundColor: Colors.redAccent.shade100,
+            child: const Icon(
+              Icons.add,
+              color: Colors.black38,
+              size: 40,
+            ),
+            mini: false,
+            tooltip: 'Add a new note',
           ),
-          onPressed: () {
-            Navigator.of(context).pushNamed(CreateUpdateNoteView.routeName);
-          },
-          backgroundColor: Colors.lightBlue.shade100,
-          child: const Icon(
-            Icons.add,
-            color: Colors.black38,
-            size: 40,
-          ),
-          mini: false,
-          tooltip: 'Add a new note',
         ),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(kAppBarHeight),
@@ -70,17 +74,18 @@ class _NotesViewState extends State<NotesView> {
             padding: const EdgeInsets.only(top: 10, right: 20, left: 20),
             child: AppBar(
               iconTheme: const IconThemeData(
-                color: Colors.black38,
+                color: Colors.black,
                 size: 17,
               ),
               titleTextStyle: const TextStyle(
-                color: Colors.black38,
+                color: Colors.black,
                 fontSize: 15,
               ),
               backgroundColor: Colors.lightBlue.shade100,
               toolbarHeight: kAppBarHeight,
               scrolledUnderElevation: 3,
-              shape: const StadiumBorder(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
                 side: BorderSide(
                   width: 0,
                   color: Colors.transparent,

@@ -35,37 +35,61 @@ class _NotesGridViewState extends State<NotesGridView> {
       mainAxisSpacing: 6,
       itemBuilder: (context, index) {
         final note = widget.notes.elementAt(index);
-        return Dismissible(
-          key: ObjectKey(note),
-          onDismissed: (direction) async {
-            // deleteItem(index, item);
-            deletedNote = note;
-            final shouldDelete = await showDeleteDialog(context);
-            if (shouldDelete) {
-              widget.onDeleteNote(note);
-              deletedNote = null;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  duration: Duration(seconds: 5),
-                  content: Text(
-                    'Note deleted!',
-                    textAlign: TextAlign.center,
+        return GestureDetector(
+          onTap: () => widget.onTap(note),
+          child: Dismissible(
+            key: ObjectKey(note),
+            onDismissed: (direction) async {
+              // deleteItem(index, item);
+              deletedNote = note;
+              final shouldDelete = await showDeleteDialog(context);
+              if (shouldDelete) {
+                widget.onDeleteNote(note);
+                deletedNote = null;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    duration: Duration(seconds: 5),
+                    content: Text(
+                      'Note deleted!',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
+                );
+              } else {
+                setState(() {});
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border:
+                    Border.all(color: Colors.lightBlue.shade300, width: 0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (note.title.isNotEmpty)
+                      Text(
+                        note.title,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    if (note.title.isNotEmpty) const SizedBox(height: 10),
+                    Text(
+                      note.text,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            } else {
-              setState(() {});
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              border: Border.all(color: Colors.redAccent.shade100, width: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(note.text),
+              ),
             ),
           ),
         );
