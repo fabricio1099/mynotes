@@ -6,6 +6,7 @@ import 'package:mynotes/services/auth/bloc/auth_event.dart';
 import 'package:mynotes/services/auth/bloc/auth_state.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
 import 'package:mynotes/utilities/dialogs/password_reset_email_sent_dialog.dart';
+import 'package:mynotes/utilities/widgets/custom_auth_text_input_field.dart';
 
 class ForgotPasswordView extends StatefulWidget {
   const ForgotPasswordView({Key? key}) : super(key: key);
@@ -57,46 +58,78 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Forgot Password'),
-        ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const Text(
-                    'If you forgot your password, simply enter your email and we will send you a password reset link.'),
-                TextField(
-                  keyboardType: TextInputType.emailAddress,
-                  autocorrect: false,
-                  autofocus: true,
-                  controller: _controller,
-                  decoration:
-                      const InputDecoration(hintText: 'Your email address...'),
+          child: LayoutBuilder(builder: (context, constraint) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraint.maxHeight,
                 ),
-                TextButton(
-                  onPressed: () {
-                    final email = _controller.text;
-                    context.read<AuthBloc>().add(
-                          AuthEventForgotPassword(
-                            email: email,
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(
+                        height: 175,
+                        width: 175,
+                        child: Image(
+                          image: AssetImage('assets/icon/icon-locker.png'),
+                        ),
+                      ),
+                      const Spacer(),
+                      const Text(
+                        'Enter your email address and we will send you a link to reset your password.',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      CustomAuthTextInputField(
+                        controller: _controller,
+                        isEmail: true,
+                        emailHint: 'Email',
+                      ),
+                      const Spacer(),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        child: TextButton(
+                          onPressed: () async {
+                            final email = _controller.text;
+                            context.read<AuthBloc>().add(
+                                  AuthEventForgotPassword(
+                                    email: email,
+                                  ),
+                                );
+                          },
+                          child: const Text(
+                            'Reset my password',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        );
-                  },
-                  child: const Text('send me password reset link'),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context.read<AuthBloc>().add(
+                                const AuthEventLogOut(),
+                              );
+                        },
+                        child: const Text(
+                          'Back to login page',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(
-                          const AuthEventLogOut(),
-                        );
-                  },
-                  child: const Text('Back to login page'),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          }),
         ),
       ),
     );

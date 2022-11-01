@@ -4,8 +4,8 @@ import 'package:mynotes/services/auth/bloc/auth_bloc.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
 import 'package:mynotes/services/auth/bloc/auth_state.dart';
 
-class CustomTextInputField extends StatefulWidget {
-  const CustomTextInputField({
+class CustomAuthTextInputField extends StatefulWidget {
+  const CustomAuthTextInputField({
     Key? key,
     required this.controller,
     this.isPassword,
@@ -25,10 +25,10 @@ class CustomTextInputField extends StatefulWidget {
   final String? confirmPasswordHint;
 
   @override
-  State<CustomTextInputField> createState() => _CustomTextInputFieldState();
+  State<CustomAuthTextInputField> createState() => _CustomAuthTextInputFieldState();
 }
 
-class _CustomTextInputFieldState extends State<CustomTextInputField> {
+class _CustomAuthTextInputFieldState extends State<CustomAuthTextInputField> {
   bool _showPassword = false;
 
   @override

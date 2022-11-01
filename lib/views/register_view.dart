@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
-import 'package:mynotes/utilities/widgets/custom_text_input_field.dart';
+import 'package:mynotes/utilities/widgets/custom_auth_text_input_field.dart';
 import '../services/auth/bloc/auth_bloc.dart';
 import '../services/auth/bloc/auth_state.dart';
 
@@ -66,6 +66,7 @@ class _RegisterViewState extends State<RegisterView> {
                 child: IntrinsicHeight(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Spacer(),
                       Row(
@@ -99,13 +100,13 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                       ),
                       const Spacer(),
-                      CustomTextInputField(
+                      CustomAuthTextInputField(
                         controller: _email,
                         isEmail: true,
                         emailHint: 'Email',
                       ),
                       const SizedBox(height: 10),
-                      CustomTextInputField(
+                      CustomAuthTextInputField(
                         controller: _password,
                         isPassword: true,
                         passwordHint: 'Password',

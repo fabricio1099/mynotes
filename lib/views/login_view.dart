@@ -6,7 +6,7 @@ import 'package:mynotes/services/auth/bloc/auth_event.dart';
 import 'package:mynotes/services/auth/bloc/auth_state.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
 import 'package:mynotes/utilities/dialogs/loading_dialog.dart';
-import 'package:mynotes/utilities/widgets/custom_text_input_field.dart';
+import 'package:mynotes/utilities/widgets/custom_auth_text_input_field.dart';
 
 class LoginView extends StatefulWidget {
   static const routeName = '/login';
@@ -100,13 +100,13 @@ class _LoginViewState extends State<LoginView> {
                       const SizedBox(
                         height: 50.0,
                       ),
-                      CustomTextInputField(
+                      CustomAuthTextInputField(
                         controller: _email,
                         isEmail: true,
                         emailHint: 'Email',
                       ),
                       const SizedBox(height: 10),
-                      CustomTextInputField(
+                      CustomAuthTextInputField(
                         controller: _password,
                         isPassword: true,
                         passwordHint: 'Password',
