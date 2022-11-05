@@ -20,7 +20,6 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  CloseDialog? _closeDialogHandle;
 
   @override
   void initState() {
@@ -73,12 +72,13 @@ class _LoginViewState extends State<LoginView> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(
-                        height: 175,
-                        width: 175,
+                        height: 100,
+                        width: 100,
                         child: Image(
                           image: AssetImage(('assets/icon/icon.png')),
                         ),
                       ),
+                      const SizedBox(height: 10),
                       const Spacer(),
                       const Text(
                         "Hello",

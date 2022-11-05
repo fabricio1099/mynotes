@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
@@ -17,33 +16,77 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Verify Email'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const Text(
-                  "We've sent you an email verification. Please open it to verify your account"),
-              const Text(
-                  "If you haven't received a verification email yet, press the button below"),
-              TextButton(
-                child: const Text('Send email verification'),
-                onPressed: () {
-                  context.read<AuthBloc>().add(const AuthEventSendEmaiVerification());
-                },
+        child: LayoutBuilder(
+          builder: (context, constraint) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: Image(
+                          image: AssetImage('assets/icon/icon-open-envelope-100.png'),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "We've sent you an email verification. Please open it to verify your account",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "If you haven't received it, press the button below please",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.redAccent,
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            context
+                                .read<AuthBloc>()
+                                .add(const AuthEventSendEmaiVerification());
+                          },
+                          child: const Text(
+                            'Resend verification email',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context.read<AuthBloc>().add(const AuthEventLogOut());
+                        },
+                        child: const Text(
+                          'Back to login page',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              TextButton(
-                // Widget: const Text('Restart'),
-                onPressed: () {
-                  context.read<AuthBloc>().add(const AuthEventLogOut());
-                },
-                child: const Text('Restart'),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

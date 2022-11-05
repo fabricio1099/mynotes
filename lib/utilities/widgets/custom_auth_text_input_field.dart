@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mynotes/services/auth/bloc/auth_bloc.dart';
-import 'package:mynotes/services/auth/bloc/auth_event.dart';
-import 'package:mynotes/services/auth/bloc/auth_state.dart';
 
 class CustomAuthTextInputField extends StatefulWidget {
   const CustomAuthTextInputField({
@@ -36,12 +32,14 @@ class _CustomAuthTextInputFieldState extends State<CustomAuthTextInputField> {
     String? hintText = '';
     TextInputType? keyboardType;
     bool showPasswordVisibilityIcon = false;
+    bool isPasswordOrConfirmPassword = false;
     if (widget.isPassword != null &&
         widget.isPassword! &&
         widget.passwordHint != null) {
       hintText = widget.passwordHint;
       keyboardType = TextInputType.visiblePassword;
       showPasswordVisibilityIcon = true;
+      isPasswordOrConfirmPassword = true;
     }
     if (widget.isConfirmPassword != null &&
         widget.isConfirmPassword! &&
@@ -49,6 +47,7 @@ class _CustomAuthTextInputFieldState extends State<CustomAuthTextInputField> {
       hintText = widget.confirmPasswordHint;
       keyboardType = TextInputType.visiblePassword;
       showPasswordVisibilityIcon = true;
+      isPasswordOrConfirmPassword = true;
     }
     if (widget.isEmail != null && widget.isEmail! && widget.emailHint != null) {
       hintText = widget.emailHint;
@@ -69,10 +68,7 @@ class _CustomAuthTextInputFieldState extends State<CustomAuthTextInputField> {
             Flexible(
               child: TextField(
                 controller: widget.controller,
-                obscureText: !_showPassword,
-                // (widget.isPassword != null && widget.isPassword!)
-                //     ? !showPassword
-                //     : false,
+                obscureText: isPasswordOrConfirmPassword && !_showPassword,
                 enableSuggestions: false,
                 autocorrect: false,
                 keyboardType: keyboardType,
@@ -94,11 +90,6 @@ class _CustomAuthTextInputFieldState extends State<CustomAuthTextInputField> {
                   setState(() {
                     _showPassword = !_showPassword;
                   });
-                  // context.read<AuthBloc>().add(
-                  //       AuthEventLoginShowPassword(
-                  //         !showPassword,
-                  //       ),
-                  //     );
                 },
               ),
           ],

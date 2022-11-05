@@ -60,76 +60,78 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: LayoutBuilder(builder: (context, constraint) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraint.maxHeight,
-                ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(
-                        height: 175,
-                        width: 175,
-                        child: Image(
-                          image: AssetImage('assets/icon/icon-locker.png'),
+          child: LayoutBuilder(
+            builder: (context, constraint) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraint.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image(
+                            image: AssetImage('assets/icon/icon-locker.png'),
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      const Text(
-                        'Enter your email address and we will send you a link to reset your password.',
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 10),
-                      CustomAuthTextInputField(
-                        controller: _controller,
-                        isEmail: true,
-                        emailHint: 'Email',
-                      ),
-                      const Spacer(),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.deepPurpleAccent,
+                        const Spacer(),
+                        const Text(
+                          'Enter your email address and we will send you a link to reset your password.',
+                          textAlign: TextAlign.center,
                         ),
-                        child: TextButton(
-                          onPressed: () async {
-                            final email = _controller.text;
-                            context.read<AuthBloc>().add(
-                                  AuthEventForgotPassword(
-                                    email: email,
-                                  ),
-                                );
-                          },
-                          child: const Text(
-                            'Reset my password',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                        const SizedBox(height: 10),
+                        CustomAuthTextInputField(
+                          controller: _controller,
+                          isEmail: true,
+                          emailHint: 'Email',
+                        ),
+                        const Spacer(),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.deepPurpleAccent,
+                          ),
+                          child: TextButton(
+                            onPressed: () async {
+                              final email = _controller.text;
+                              context.read<AuthBloc>().add(
+                                    AuthEventForgotPassword(
+                                      email: email,
+                                    ),
+                                  );
+                            },
+                            child: const Text(
+                              'Reset my password',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(
-                                const AuthEventLogOut(),
-                              );
-                        },
-                        child: const Text(
-                          'Back to login page',
-                          textAlign: TextAlign.center,
+                        TextButton(
+                          onPressed: () {
+                            context.read<AuthBloc>().add(
+                                  const AuthEventLogOut(),
+                                );
+                          },
+                          child: const Text(
+                            'Back to login page',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            },
+          ),
         ),
       ),
     );
