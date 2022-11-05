@@ -4,11 +4,13 @@ import 'package:equatable/equatable.dart';
 
 @immutable
 abstract class AuthState {
+  final bool loggedIn;
   final bool isLoading;
   final String? loadingText;
   const AuthState({
     required this.isLoading,
     this.loadingText = 'Please wait a moment',
+    this.loggedIn = false,
   });
 }
 
@@ -20,7 +22,7 @@ class AuthStateUnInitialized extends AuthState {
 class AuthStateLoggedIn extends AuthState {
   final AuthUser user;
   const AuthStateLoggedIn({required this.user, required bool isLoading})
-      : super(isLoading: isLoading);
+      : super(isLoading: isLoading, loggedIn: true);
 }
 
 class AuthStateNeedsVerification extends AuthState {
@@ -39,6 +41,7 @@ class AuthStateLoggedOut extends AuthState with EquatableMixin {
   }) : super(
           isLoading: isLoading,
           loadingText: loadingText,
+          loggedIn: false,
         );
 
   @override

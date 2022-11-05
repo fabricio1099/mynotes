@@ -73,8 +73,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const SizedBox(
-                          height: 100,
-                          width: 100,
+                          height: 175,
+                          width: 175,
                           child: Image(
                             image: AssetImage('assets/icon/icon-locker.png'),
                           ),

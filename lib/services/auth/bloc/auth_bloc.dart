@@ -100,8 +100,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // log out
     on<AuthEventLogOut>(
       ((event, emit) async {
+        final loggedIn = state.loggedIn;
         try {
-          authProvider.logOut();
+          if (loggedIn) {
+            authProvider.logOut();
+          }
           emit(const AuthStateLoggedOut(
             exception: null,
             isLoading: false,
