@@ -24,6 +24,8 @@ class FirebaseCloudStorageService {
       ownerUserId: ownerUserId,
       text: '',
       title: '',
+      createdDate: Timestamp.now(),
+      modifiedDate: Timestamp.now(),
     );
   }
 
@@ -42,11 +44,23 @@ class FirebaseCloudStorageService {
     required String documentId,
     required String text,
     required String title,
+    required bool isPinned,
+    required bool isFavourite,
+    required Timestamp? createdDate,
+    required Timestamp? modifiedDate,
+    required Timestamp? pinnedDate,
+    required Timestamp? favouriteDate,
   }) async {
     try {
       await notes.doc(documentId).update({
         textFieldName: text,
         titleFieldName: title,
+        createdDateFieldName: createdDate,
+        modifiedDateFieldName: modifiedDate,
+        isPinnedFieldName: isPinned,
+        pinnedDateFieldName: pinnedDate,
+        isFavouriteFieldName: isFavourite,
+        favouriteDateFieldName: favouriteDate,
       });
     } catch (e) {
       throw CouldNotUpdateNoteException();

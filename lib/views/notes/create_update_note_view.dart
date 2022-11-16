@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/utilities/dialogs/cannot_share_empty_note_dialog.dart';
@@ -20,6 +21,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   late final FirebaseCloudStorageService _notesService;
   late final TextEditingController _textController;
   late final TextEditingController _titleController;
+  bool _isPinned = false;
+  bool _isFavourite = false;
 
   void _noteControllerListener() async {
     final note = _note;
@@ -32,6 +35,15 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       documentId: note.documentId,
       text: text,
       title: title,
+      isPinned: _isPinned,
+      isFavourite: _isFavourite,
+      createdDate: note.createdDate,
+      modifiedDate: Timestamp.now(),
+      pinnedDate:
+          (_isPinned != null && _isPinned == true) ? Timestamp.now() : null,
+      favouriteDate: (_isFavourite != null && _isFavourite == true)
+          ? Timestamp.now()
+          : null,
     );
   }
 
@@ -51,6 +63,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       _note = widgetNote;
       _textController.text = widgetNote.text;
       _titleController.text = widgetNote.title;
+      _isPinned = widgetNote.isPinned;
+      _isFavourite = widgetNote.isFavourite;
       return widgetNote;
     }
 
@@ -83,6 +97,15 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         documentId: note.documentId,
         text: text,
         title: title,
+        isPinned: _isPinned,
+        isFavourite: _isFavourite,
+        createdDate: note.createdDate,
+        modifiedDate: Timestamp.now(),
+        pinnedDate:
+            (_isPinned != null && _isPinned == true) ? Timestamp.now() : null,
+        favouriteDate: (_isFavourite != null && _isFavourite == true)
+            ? Timestamp.now()
+            : null,
       );
     }
   }

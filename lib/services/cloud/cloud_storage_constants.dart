@@ -1,3 +1,9 @@
  const ownerUserIdFieldName = 'user_id';
  const textFieldName = 'text';
  const titleFieldName = 'title';
+ const createdDateFieldName = 'createdDate';
+ const modifiedDateFieldName = 'modifiedDate';
+ const isPinnedFieldName = 'isPinned';
+ const pinnedDateFieldName = 'pinnedDate';
+ const isFavouriteFieldName = 'isFavourite';
+ const favouriteDateFieldName = 'favouriteDate';

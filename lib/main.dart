@@ -8,6 +8,7 @@ import 'package:mynotes/services/auth/firebase_auth_provider.dart';
 import 'package:mynotes/views/forgot_password_view.dart';
 import 'package:mynotes/views/login_view.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
+import 'package:mynotes/views/notes/profile_view.dart';
 import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
 import 'views/verify_email_view.dart';
@@ -31,6 +32,7 @@ void main() {
       routes: {
         CreateUpdateNoteView.routeName: (context) =>
             const CreateUpdateNoteView(),
+        ProfileView.routeName: (context) => const ProfileView(),
       },
     ),
   );
@@ -73,7 +75,7 @@ class _HomePageState extends State<HomePage> {
             return const LoginView();
           } else if (state is AuthStateRegistering) {
             return const RegisterView();
-          } else if(state is AuthStateForgotPassword) {
+          } else if (state is AuthStateForgotPassword) {
             return const ForgotPasswordView();
           } else {
             return const Scaffold(

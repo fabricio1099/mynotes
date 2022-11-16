@@ -50,6 +50,8 @@ dependencies:
   intl: ^0.17.0
   flutter_staggered_grid_view: ^0.6.2
   flutter_native_splash: ^2.2.13
+  carousel_slider: ^4.1.1
+  group_list_view: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +83,7 @@ flutter:
     - assets/icon/icon.png
     - assets/icon/icon-locker.png
     - assets/icon/icon-open-envelope-100.png
+    - assets/icon/avatar-100.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
