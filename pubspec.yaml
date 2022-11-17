@@ -52,6 +52,7 @@ dependencies:
   flutter_native_splash: ^2.2.13
   carousel_slider: ^4.1.1
   group_list_view: ^1.1.1
+  font_awesome_flutter: ^10.2.1
 
 dev_dependencies:
   flutter_test:

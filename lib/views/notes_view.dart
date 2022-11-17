@@ -23,6 +23,7 @@ import 'package:mynotes/views/notes/notes_grid_view.dart';
 import 'dart:developer' as d show log;
 import 'package:group_list_view/group_list_view.dart';
 import 'package:mynotes/views/notes/profile_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 extension Count<T extends Iterable> on Stream<T> {
   Stream<int> get getLength => map((event) => event.length);
@@ -88,19 +89,24 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                     final allNotes = snapshot.data as Iterable<CloudNote>;
                     final DateFormat formatter = DateFormat('dd/MM/yyyy');
 
-                    SplayTreeMap<String, List<CloudNote>> mappedNotes =
+                    SplayTreeMap<String, List<CloudNote>>
+                        allNotesMappedByModifiedDate =
                         SplayTreeMap<String, List<CloudNote>>();
                     for (var note in allNotes.toList()) {
                       final String modifiedDateFormatted =
                           formatter.format(note.modifiedDate!.toDate());
-                      if (!mappedNotes.containsKey(modifiedDateFormatted)) {
-                        mappedNotes[modifiedDateFormatted] = [note];
+                      if (!allNotesMappedByModifiedDate
+                          .containsKey(modifiedDateFormatted)) {
+                        allNotesMappedByModifiedDate[modifiedDateFormatted] = [
+                          note
+                        ];
                       } else {
-                        mappedNotes[modifiedDateFormatted]!.add(note);
+                        allNotesMappedByModifiedDate[modifiedDateFormatted]!
+                            .add(note);
                       }
                     }
-                    mappedNotes = SplayTreeMap.from(
-                      mappedNotes,
+                    allNotesMappedByModifiedDate = SplayTreeMap.from(
+                      allNotesMappedByModifiedDate,
                       (key1, key2) {
                         final date1 = DateFormat('dd/MM/yyyy').parse(key1);
                         final date2 = DateFormat('dd/MM/yyyy').parse(key2);
@@ -108,13 +114,17 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                       },
                     );
 
-                    final sortedNotes = allNotes.toList();
-                    sortedNotes.sort(
+                    final allNotesSortedByModifiedDate = allNotes.toList();
+                    allNotesSortedByModifiedDate.sort(
                       (note1, note2) {
                         return note1.modifiedDate!
                             .compareTo(note2.modifiedDate!);
                       },
                     );
+
+                    final pinnedNotes =
+                        allNotes.where((note) => note.isPinned).toList();
+
                     return Padding(
                       padding: const EdgeInsets.only(left: 20, right: 20),
                       child: Column(
@@ -130,34 +140,66 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                           const SizedBox(
                             height: 20,
                           ),
-                          CarouselSlider.builder(
-                            itemCount: sortedNotes.length,
-                            itemBuilder: (context, itemIndex, pageViewIndex) {
-                              final note = sortedNotes.elementAt(itemIndex);
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: myColor,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(note.text),
-                              );
-                            },
-                            options: CarouselOptions(
-                              autoPlay: false,
-                              enableInfiniteScroll: false,
-                              scrollDirection: Axis.horizontal,
-                              viewportFraction: 0.5,
-                              disableCenter: true,
-                              enlargeCenterPage: true,
-                              initialPage: 0,
-                              aspectRatio: 27 / 9,
-                              pageSnapping: true,
-                              padEnds: false,
+                          if (pinnedNotes.isNotEmpty)
+                            CarouselSlider.builder(
+                              itemCount: pinnedNotes.length,
+                              itemBuilder: (context, itemIndex, pageViewIndex) {
+                                final note = pinnedNotes.elementAt(itemIndex);
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: myColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ListTile(
+                                        title: Text(
+                                          note.title,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        subtitle: Text(
+                                          note.text,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        isThreeLine: true,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
+                                        child: Row(
+                                          children: const [
+                                            Icon(FontAwesomeIcons.mapPin,
+                                                size: 16),
+                                            Text('Pinned'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              options: CarouselOptions(
+                                autoPlay: false,
+                                enableInfiniteScroll: false,
+                                scrollDirection: Axis.horizontal,
+                                viewportFraction: 0.5,
+                                disableCenter: true,
+                                enlargeCenterPage: true,
+                                initialPage: 0,
+                                aspectRatio: 27 / 9,
+                                pageSnapping: true,
+                                padEnds: false,
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          if (pinnedNotes.isNotEmpty)
+                            const SizedBox(
+                              height: 20,
+                            ),
                           TabBar(
                             controller: _tabController,
                             isScrollable: true,
@@ -194,9 +236,9 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                               children: [
                                 GroupListView(
                                   itemBuilder: (context, index) {
-                                    List<CloudNote> sortedValues = mappedNotes
-                                        .values
-                                        .toList()[index.section];
+                                    List<CloudNote> sortedValues =
+                                        allNotesMappedByModifiedDate.values
+                                            .toList()[index.section];
                                     sortedValues.sort((note1, note2) {
                                       return note2.modifiedDate!
                                           .compareTo(note1.modifiedDate!);
@@ -227,11 +269,14 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                       ),
                                     );
                                   },
-                                  sectionsCount:
-                                      mappedNotes.keys.toList().length,
+                                  sectionsCount: allNotesMappedByModifiedDate
+                                      .keys
+                                      .toList()
+                                      .length,
                                   groupHeaderBuilder: ((context, section) {
-                                    String date =
-                                        mappedNotes.keys.toList()[section];
+                                    String date = allNotesMappedByModifiedDate
+                                        .keys
+                                        .toList()[section];
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 8,
@@ -245,7 +290,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                     );
                                   }),
                                   countOfItemInSection: (section) {
-                                    return mappedNotes.values
+                                    return allNotesMappedByModifiedDate.values
                                         .toList()[section]
                                         .length;
                                   },
