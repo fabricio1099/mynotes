@@ -9,15 +9,18 @@ import 'package:mynotes/constants/app_bar_constants.dart';
 import 'package:mynotes/constants/colors.dart';
 import 'package:mynotes/enums/menu_action.dart';
 import 'package:mynotes/extensions/buildcontext/loc.dart';
+import 'package:mynotes/helpers/loading/loading_screen.dart';
 import 'package:mynotes/models/note.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/auth/bloc/auth_bloc.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
+import 'package:mynotes/services/auth/bloc/auth_state.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
 import 'package:mynotes/utilities/dialogs/logout_dialog.dart';
+import 'package:mynotes/utilities/widgets/rounded_rectangle_tabbar_indicator.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
 import 'package:mynotes/views/notes/notes_grid_view.dart';
 import 'dart:developer' as d show log;
@@ -108,8 +111,8 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                     allNotesMappedByModifiedDate = SplayTreeMap.from(
                       allNotesMappedByModifiedDate,
                       (key1, key2) {
-                        final date1 = DateFormat('dd/MM/yyyy').parse(key1);
-                        final date2 = DateFormat('dd/MM/yyyy').parse(key2);
+                        final date1 = formatter.parse(key1);
+                        final date2 = formatter.parse(key2);
                         return date2.compareTo(date1);
                       },
                     );
@@ -147,7 +150,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                 final note = pinnedNotes.elementAt(itemIndex);
                                 return Container(
                                   decoration: BoxDecoration(
-                                    color: myColor,
+                                    color: veryPaleBlue,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Column(
@@ -172,9 +175,15 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                           horizontal: 16,
                                         ),
                                         child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.baseline,
+                                          textBaseline: TextBaseline.alphabetic,
                                           children: const [
-                                            Icon(FontAwesomeIcons.mapPin,
-                                                size: 16),
+                                            Icon(
+                                              FontAwesomeIcons.mapPin,
+                                              size: 14,
+                                            ),
+                                            SizedBox(width: 5),
                                             Text('Pinned'),
                                           ],
                                         ),
@@ -201,16 +210,20 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                               height: 20,
                             ),
                           TabBar(
-                            controller: _tabController,
-                            isScrollable: true,
                             labelPadding:
                                 const EdgeInsets.only(left: 0, right: 20),
+                            indicatorPadding:
+                                const EdgeInsets.only(left: 0, right: 20),
+                            controller: _tabController,
+                            isScrollable: true,
                             labelColor: Colors.black,
                             unselectedLabelColor: Colors.grey,
-                            indicator: const UnderlineTabIndicator(
-                              borderSide:
-                                  BorderSide(width: 5.0, color: Colors.blue),
-                              insets: EdgeInsets.symmetric(horizontal: 16.0),
+                            indicator: RRectTabIndicator(
+                              color: lightBlue,
+                              radius: 3,
+                              rectangleWidth: 25,
+                              rectangleHeight: 3,
+                              verticalOffset: 8,
                             ),
                             tabs: const [
                               Tab(
@@ -230,6 +243,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                               ),
                             ],
                           ),
+                          const SizedBox(height: 20),
                           Expanded(
                             child: TabBarView(
                               controller: _tabController,
@@ -277,6 +291,34 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                     String date = allNotesMappedByModifiedDate
                                         .keys
                                         .toList()[section];
+
+                                    DateTime dateToCheck = formatter.parse(date);
+                                    dateToCheck = DateTime(
+                                      dateToCheck.year,
+                                      dateToCheck.month,
+                                      dateToCheck.day,
+                                    );
+
+                                    final now = DateTime.now();
+                                    final today = DateTime(
+                                      now.year,
+                                      now.month,
+                                      now.day,
+                                    );
+                                    final yesterday = DateTime(
+                                      now.year,
+                                      now.month,
+                                      now.day - 1,
+                                    );
+
+                                    if(dateToCheck == today){
+                                      date = 'Today';
+                                    }
+
+                                    if(dateToCheck == yesterday){
+                                      date = 'Yesterday';
+                                    }
+
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 8,
@@ -354,6 +396,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                 ),
               ),
             ),
+            const SizedBox(width: 20),
             SizedBox(
               height: 60,
               width: 60,
@@ -363,7 +406,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                 }),
                 child: const CircleAvatar(
                   child: Image(
-                    image: AssetImage(('assets/icon/icon.png')),
+                    image: AssetImage(('assets/icon/avatar-80.png')),
                   ),
                   backgroundColor: Colors.transparent,
                 ),
