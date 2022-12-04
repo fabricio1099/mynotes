@@ -143,10 +143,13 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                         CrossAxisAlignment.start,
                                     children: [
                                       ListTile(
-                                        title: Text(
-                                          note.title,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                        title: Padding(
+                                          padding: const EdgeInsets.only(bottom: 5),
+                                          child: Text(
+                                            note.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
                                         subtitle: Text(
                                           note.text,
@@ -163,13 +166,14 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.baseline,
                                           textBaseline: TextBaseline.alphabetic,
-                                          children: const [
+                                          children: [
                                             Icon(
                                               FontAwesomeIcons.mapPin,
+                                              color: lightBlue,
                                               size: 14,
                                             ),
-                                            SizedBox(width: 5),
-                                            Text('Pinned'),
+                                            const SizedBox(width: 3),
+                                            const Text('Pinned', style: TextStyle(fontSize: 12),),
                                           ],
                                         ),
                                       ),
