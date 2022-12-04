@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mynotes/constants/colors.dart';
 import 'package:mynotes/models/note.dart';
@@ -206,7 +207,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                             indicator: RRectTabIndicator(
                               color: lightBlue,
                               radius: 3,
-                              rectangleWidth: 25,
+                              rectangleWidth: 40,
                               rectangleHeight: 3,
                               verticalOffset: 8,
                             ),
@@ -214,16 +215,25 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                               Tab(
                                 child: Text(
                                   'Recent',
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                  ),
                                 ),
                               ),
                               Tab(
                                 child: Text(
                                   'Favourites',
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                  ),
                                 ),
                               ),
                               Tab(
                                 child: Text(
                                   'Shared With Me',
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                  ),
                                 ),
                               ),
                             ],
@@ -251,8 +261,15 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                         );
                                       },
                                       child: Container(
+                                        height: 80,
                                         margin: const EdgeInsets.only(
-                                            top: 10, bottom: 10),
+                                          top: 10,
+                                          bottom: 10,
+                                        ),
+                                        padding: const EdgeInsets.only(
+                                          top: 5,
+                                          bottom: 10,
+                                        ),
                                         decoration: const BoxDecoration(
                                           gradient: LinearGradient(
                                             stops: [0.02, 0.02],
@@ -262,8 +279,17 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                               Radius.circular(8)),
                                         ),
                                         child: ListTile(
-                                          title: Text(note.title),
-                                          subtitle: Text(note.text),
+                                          title: Text(
+                                            note.title,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            note.text,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
                                       ),
                                     );
@@ -353,7 +379,8 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
     return PreferredSize(
       preferredSize: const Size.fromHeight(100),
       child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 20),
+        padding:
+            const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
