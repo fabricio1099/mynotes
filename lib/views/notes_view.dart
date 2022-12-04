@@ -147,7 +147,8 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                     children: [
                                       ListTile(
                                         title: Padding(
-                                          padding: const EdgeInsets.only(bottom: 5),
+                                          padding:
+                                              const EdgeInsets.only(bottom: 5),
                                           child: Text(
                                             note.title,
                                             maxLines: 1,
@@ -176,7 +177,10 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                               size: 14,
                                             ),
                                             const SizedBox(width: 3),
-                                            const Text('Pinned', style: TextStyle(fontSize: 12),),
+                                            const Text(
+                                              'Pinned',
+                                              style: TextStyle(fontSize: 12),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -284,18 +288,43 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(8)),
                                         ),
-                                        child: ListTile(
-                                          title: Text(
-                                            note.title,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: ListTile(
+                                                title: Text(
+                                                  note.title,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                subtitle: Text(
+                                                  note.text,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                          subtitle: Text(
-                                            note.text,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                                            const SizedBox(
+                                              width: 25,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 30),
+                                              child: Chip(
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                    Radius.circular(8),
+                                                  ),
+                                                ),
+                                                backgroundColor: veryPaleYellow,
+                                                label: const Text("Random"),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     );
