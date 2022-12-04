@@ -61,8 +61,10 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
               Navigator.of(context).pushNamed(CreateUpdateNoteView.routeName);
             },
             child: const Icon(
-              Icons.edit,
+              FontAwesomeIcons.penToSquare,
+              size: 18,
             ),
+            backgroundColor: lightBlue,
             mini: false,
             tooltip: 'Add a new note',
           ),
