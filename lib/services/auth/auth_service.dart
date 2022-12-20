@@ -15,10 +15,7 @@ class AuthService implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> createUser({
-    required String email,
-    required String password,
-  }) {
+  Future<AuthUser> createUser({required String email, required String password}) {
     return provider.createUser(email: email, password: password);
   }
 
@@ -33,10 +30,7 @@ class AuthService implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> logIn({
-    required String email,
-    required String password,
-  }) {
+  Future<AuthUser> logIn({required String email, required String password}) {
     return provider.logIn(email: email, password: password);
   }
 
@@ -44,7 +38,7 @@ class AuthService implements AuthProvider {
   Future<void> logOut() {
     return provider.logOut();
   }
-  
+
   @override
   Future<void> sendPasswordReset({required String toEmail}) {
     return provider.sendPasswordReset(toEmail: toEmail);

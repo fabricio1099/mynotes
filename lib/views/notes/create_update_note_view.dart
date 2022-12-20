@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mynotes/enums/note_category.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:mynotes/utilities/generics/get_arguments.dart';
@@ -23,38 +25,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   late final TextEditingController _titleController;
   bool _isPinned = false;
   bool _isFavourite = false;
-
-  void _noteControllerListener() async {
-    final note = _note;
-    if (note == null) {
-      return;
-    }
-    final text = _textController.text;
-    final title = _titleController.text;
-    await _notesService.updateNote(
-      documentId: note.documentId,
-      text: text,
-      title: title,
-      isPinned: _isPinned,
-      isFavourite: _isFavourite,
-      createdDate: note.createdDate,
-      modifiedDate: Timestamp.now(),
-      pinnedDate:
-          (_isPinned != null && _isPinned == true) ? Timestamp.now() : null,
-      favouriteDate: (_isFavourite != null && _isFavourite == true)
-          ? Timestamp.now()
-          : null,
-    );
-  }
-
-  // Why use this instead of adding the listeners in the initState function
-  // and removing it in the dispose function ?
-  void _setupNoteControllerListener() {
-    _textController.removeListener(_noteControllerListener);
-    _titleController.removeListener(_noteControllerListener);
-    _textController.addListener(_noteControllerListener);
-    _titleController.addListener(_noteControllerListener);
-  }
+  Timestamp? _pinnedDate;
+  Timestamp? _favouriteDate;
+  final String _noteCategory = NoteCategory.random.print;
 
   Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
     final widgetNote = context.getArgument<CloudNote>();
@@ -72,20 +45,19 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     if (existingNote != null) {
       return existingNote;
     }
+
     final currentUser = AuthService.firebase().currentUser!;
-    final newNote =
-        await _notesService.createNewNote(ownerUserId: currentUser.id);
+    final newNote = CloudNote(
+      documentId: CloudNote.initialNoteDocumentId,
+      ownerUserId: currentUser.id,
+      text: '',
+      title: '',
+      createdDate: Timestamp.now(),
+      modifiedDate: Timestamp.now(),
+      category: _noteCategory,
+    );
     _note = newNote;
     return newNote;
-  }
-
-  void _deleteNoteIfTextAndTitleAreEmpty() {
-    final note = _note;
-    if (_textController.text.isEmpty &&
-        _titleController.text.isEmpty &&
-        note != null) {
-      _notesService.deleteNote(documentId: note.documentId);
-    }
   }
 
   void _saveNoteIfTextOrTitleNotEmpty() async {
@@ -93,19 +65,33 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final text = _textController.text;
     final title = _titleController.text;
     if (note != null && (text.isNotEmpty || title.isNotEmpty)) {
-      await _notesService.updateNote(
+      final currentUser = AuthService.firebase().currentUser!;
+      final String documentId = await _notesService.saveNote(
+        ownerUserId: currentUser.id,
         documentId: note.documentId,
         text: text,
         title: title,
         isPinned: _isPinned,
         isFavourite: _isFavourite,
         createdDate: note.createdDate,
-        modifiedDate: Timestamp.now(),
-        pinnedDate:
-            (_isPinned != null && _isPinned == true) ? Timestamp.now() : null,
-        favouriteDate: (_isFavourite != null && _isFavourite == true)
-            ? Timestamp.now()
-            : null,
+        modifiedDate: note.modifiedDate,
+        pinnedDate: _pinnedDate,
+        favouriteDate: _favouriteDate,
+        category: _noteCategory,
+      );
+
+      _note = CloudNote(
+        documentId: documentId,
+        ownerUserId: currentUser.id,
+        text: _textController.text,
+        title: _titleController.text,
+        isPinned: _isPinned,
+        isFavourite: _isFavourite,
+        createdDate: note.createdDate,
+        modifiedDate: note.modifiedDate,
+        pinnedDate: _pinnedDate,
+        favouriteDate: _favouriteDate,
+        category: _noteCategory,
       );
     }
   }
@@ -115,15 +101,11 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     _notesService = FirebaseCloudStorageService();
     _textController = TextEditingController();
     _titleController = TextEditingController();
-    // _textController.addListener(_textControllerListener);
     super.initState();
   }
 
   @override
   void dispose() {
-    _deleteNoteIfTextAndTitleAreEmpty();
-    _saveNoteIfTextOrTitleNotEmpty();
-    // _textController.removeListener(_textControllerListener);
     _textController.dispose();
     super.dispose();
   }
@@ -139,6 +121,10 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
+          IconButton(
+            onPressed: _saveNoteIfTextOrTitleNotEmpty,
+            icon: const Icon(FontAwesomeIcons.check),
+          ),
           IconButton(
             onPressed: () async {
               final text = _textController.text;
@@ -162,11 +148,12 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                 case ConnectionState.done:
                   final text = _textController.text;
                   final title = _titleController.text;
-                  _setupNoteControllerListener();
+                  // _setupNoteControllerListener();
                   return Column(
                     children: [
                       TextField(
                         controller: _titleController,
+                        autofocus: text.isEmpty && title.isEmpty,
                         style: const TextStyle(
                           fontSize: 25,
                         ),
@@ -179,7 +166,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                       ),
                       TextField(
                         controller: _textController,
-                        autofocus: text.isEmpty && title.isEmpty,
+                        autofocus: text.isNotEmpty,
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                         decoration: const InputDecoration(
