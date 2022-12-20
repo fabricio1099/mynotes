@@ -12,21 +12,59 @@ class FirebaseCloudStorageService {
   FirebaseCloudStorageService._sharedInstance();
   factory FirebaseCloudStorageService() => _shared;
 
-  Future<CloudNote> createNewNote({required String ownerUserId}) async {
-    final document = await notes.add({
-      ownerUserIdFieldName: ownerUserId,
-      textFieldName: '',
-      titleFieldName: '',
-    });
-    final fetchedNote = await document.get();
-    return CloudNote(
-      documentId: fetchedNote.id,
-      ownerUserId: ownerUserId,
-      text: '',
-      title: '',
-      createdDate: Timestamp.now(),
-      modifiedDate: Timestamp.now(),
-    );
+  Future<String> saveNote({
+    required String ownerUserId,
+    required String documentId,
+    required String text,
+    required String title,
+    required bool isPinned,
+    required bool isFavourite,
+    required Timestamp? createdDate,
+    required Timestamp? modifiedDate,
+    required Timestamp? pinnedDate,
+    required Timestamp? favouriteDate,
+    required String category,
+  }) async {
+    if (documentId == CloudNote.initialNoteDocumentId) {
+      try {
+        final document = await notes.add({
+          ownerUserIdFieldName: ownerUserId,
+          textFieldName: text,
+          titleFieldName: title,
+          ownerUserId: ownerUserId,
+          isPinnedFieldName: isPinned,
+          isFavouriteFieldName: isFavourite,
+          createdDateFieldName: createdDate,
+          modifiedDateFieldName: modifiedDate,
+          pinnedDateFieldName: pinnedDate,
+          favouriteDateFieldName: favouriteDate,
+          categoryFieldName: category,
+        });
+        final fetchedNote = await document.get();
+        return fetchedNote.id;
+      } catch (e) {
+        throw CouldNotCreateNoteException();
+      }
+    } else {
+      try {
+        await notes.doc(documentId).update({
+          ownerUserIdFieldName: ownerUserId,
+          textFieldName: text,
+          titleFieldName: title,
+          ownerUserId: ownerUserId,
+          isPinnedFieldName: isPinned,
+          isFavouriteFieldName: isFavourite,
+          createdDateFieldName: createdDate,
+          modifiedDateFieldName: modifiedDate,
+          pinnedDateFieldName: pinnedDate,
+          favouriteDateFieldName: favouriteDate,
+          categoryFieldName: category,
+        });
+        return documentId;
+      } catch (e) {
+        throw CouldNotUpdateNoteException();
+      }
+    }
   }
 
   Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) {
@@ -35,7 +73,9 @@ class FirebaseCloudStorageService {
         .snapshots()
         .map(
           (event) => event.docs.map(
-            (doc) => CloudNote.fromSnapshot(doc),
+            (doc) {
+              return CloudNote.fromSnapshot(doc);
+            },
           ),
         );
   }
@@ -50,6 +90,7 @@ class FirebaseCloudStorageService {
     required Timestamp? modifiedDate,
     required Timestamp? pinnedDate,
     required Timestamp? favouriteDate,
+    required String category,
   }) async {
     try {
       await notes.doc(documentId).update({
@@ -61,6 +102,7 @@ class FirebaseCloudStorageService {
         pinnedDateFieldName: pinnedDate,
         isFavouriteFieldName: isFavourite,
         favouriteDateFieldName: favouriteDate,
+        categoryFieldName: category,
       });
     } catch (e) {
       throw CouldNotUpdateNoteException();

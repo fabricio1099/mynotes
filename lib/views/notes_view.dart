@@ -1,9 +1,9 @@
 import 'dart:collection';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mynotes/constants/colors.dart';
+import 'package:mynotes/constants/note_categories.dart';
 import 'package:mynotes/models/note.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
@@ -64,7 +64,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
               FontAwesomeIcons.penToSquare,
               size: 18,
             ),
-            backgroundColor: lightBlue,
+            backgroundColor: const Color(lightBlueHex),
             mini: false,
             tooltip: 'Add a new note',
           ),
@@ -138,7 +138,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                 final note = pinnedNotes.elementAt(itemIndex);
                                 return Container(
                                   decoration: BoxDecoration(
-                                    color: veryPaleBlue,
+                                    color: const Color(veryPaleBlueHex),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Column(
@@ -170,14 +170,14 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.baseline,
                                           textBaseline: TextBaseline.alphabetic,
-                                          children: [
+                                          children: const [
                                             Icon(
                                               FontAwesomeIcons.mapPin,
-                                              color: lightBlue,
+                                              color: Color(lightBlueHex),
                                               size: 14,
                                             ),
-                                            const SizedBox(width: 3),
-                                            const Text(
+                                            SizedBox(width: 3),
+                                            Text(
                                               'Pinned',
                                               style: TextStyle(fontSize: 12),
                                             ),
@@ -215,7 +215,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                             labelColor: Colors.black,
                             unselectedLabelColor: Colors.grey,
                             indicator: RRectTabIndicator(
-                              color: lightBlue,
+                              color: const Color(lightBlueHex),
                               radius: 3,
                               rectangleWidth: 40,
                               rectangleHeight: 3,
@@ -280,15 +280,22 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                           top: 5,
                                           bottom: 10,
                                         ),
-                                        decoration: const BoxDecoration(
+                                        decoration: BoxDecoration(
                                           gradient: LinearGradient(
-                                            stops: [0.02, 0.02],
-                                            colors: [Colors.red, Colors.white],
+                                            stops: const [0.02, 0.02],
+                                            colors: [
+                                              Color(
+                                                noteCategories[note.category]!,
+                                              ),
+                                              Colors.white,
+                                            ],
                                           ),
-                                          borderRadius: BorderRadius.all(
+                                          borderRadius: const BorderRadius.all(
                                               Radius.circular(8)),
                                         ),
                                         child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             Expanded(
                                               child: ListTile(
@@ -311,7 +318,8 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  right: 30),
+                                                right: 30,
+                                              ),
                                               child: Chip(
                                                 shape:
                                                     const RoundedRectangleBorder(
@@ -320,8 +328,10 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                                     Radius.circular(8),
                                                   ),
                                                 ),
-                                                backgroundColor: veryPaleYellow,
-                                                label: const Text("Random"),
+                                                backgroundColor: Color(
+                                                    noteCategories[
+                                                        note.category]!),
+                                                label: Text(note.category),
                                               ),
                                             ),
                                           ],
@@ -452,7 +462,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
               child: CircleAvatar(
                 radius: 20,
                 backgroundImage: Image.asset('assets/icon/avatar-80.png').image,
-                backgroundColor: veryPaleBlue,
+                backgroundColor: const Color(veryPaleBlueHex),
               ),
             ),
           ],

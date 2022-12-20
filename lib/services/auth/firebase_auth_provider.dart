@@ -5,7 +5,6 @@ import 'package:mynotes/services/auth/auth_provider.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
-import 'dart:developer' as d show log;
 
 class FirebaseAuthProvider implements AuthProvider {
   @override
@@ -16,10 +15,7 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> createUser({
-    required String email,
-    required String password,
-  }) async {
+  Future<AuthUser> createUser({required String email, required String password}) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
@@ -70,10 +66,7 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> logIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<AuthUser> logIn({required String email, required String password}) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,

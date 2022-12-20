@@ -7,3 +7,5 @@
  const pinnedDateFieldName = 'pinnedDate';
  const isFavouriteFieldName = 'isFavourite';
  const favouriteDateFieldName = 'favouriteDate';
+ const categoryFieldName = 'category';
+ const categoryColorFieldName = 'categoryColor';

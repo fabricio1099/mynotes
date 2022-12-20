@@ -6,6 +6,7 @@ import 'auth_event.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider authProvider)
       : super(const AuthStateUnInitialized(isLoading: true)) {
+        
     // send email verification
     on<AuthEventSendEmaiVerification>((event, emit) async {
       await authProvider.sendEmailVerification();
