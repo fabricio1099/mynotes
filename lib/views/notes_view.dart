@@ -54,7 +54,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
 
   Widget buildFloatingActionButton() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0, right: 8),
+      padding: const EdgeInsets.only(bottom: 15.0, right: 8),
       child: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).pushNamed(CreateUpdateNoteView.routeName);

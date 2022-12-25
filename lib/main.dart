@@ -9,7 +9,7 @@ import 'package:mynotes/services/auth/firebase_auth_provider.dart';
 import 'package:mynotes/views/forgot_password_view.dart';
 import 'package:mynotes/views/login_view.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
-import 'package:mynotes/views/notes/home_view.dart';
+import 'package:mynotes/views/home_view.dart';
 import 'package:mynotes/views/notes/profile_view.dart';
 import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
