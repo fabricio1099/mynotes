@@ -70,26 +70,30 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedViewIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedViewIndex,
-        selectedItemColor: const Color(lightBlueHex),
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        selectedLabelStyle: TextStyle(
-          color: const Color(lightBlueHex),
-          fontFamily: Theme.of(context).textTheme.labelSmall!.fontFamily,
-          fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-        ),
-        unselectedLabelStyle: TextStyle(
-          color: Colors.grey,
-          fontFamily: Theme.of(context).textTheme.labelSmall!.fontFamily,
-          fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-        ),
-        type: BottomNavigationBarType.fixed,
-        onTap: _onItemTapped,
-        items: _navigationItems,
-        elevation: 0.7,
+      bottomNavigationBar: buildBottomNavigationBar(),
+    );
+  }
+
+  Widget buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      currentIndex: _selectedViewIndex,
+      selectedItemColor: const Color(lightBlueHex),
+      unselectedItemColor: Colors.grey,
+      showUnselectedLabels: true,
+      selectedLabelStyle: TextStyle(
+        color: const Color(lightBlueHex),
+        fontFamily: Theme.of(context).textTheme.labelSmall!.fontFamily,
+        fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
       ),
+      unselectedLabelStyle: TextStyle(
+        color: Colors.grey,
+        fontFamily: Theme.of(context).textTheme.labelSmall!.fontFamily,
+        fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+      ),
+      type: BottomNavigationBarType.fixed,
+      onTap: _onItemTapped,
+      items: _navigationItems,
+      elevation: 0.7,
     );
   }
 }

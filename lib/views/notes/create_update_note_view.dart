@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mynotes/enums/note_category.dart';
+import 'package:mynotes/constants/note_categories.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:mynotes/utilities/generics/get_arguments.dart';
@@ -27,7 +27,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   bool _isFavourite = false;
   Timestamp? _pinnedDate;
   Timestamp? _favouriteDate;
-  final String _noteCategory = NoteCategory.random.print;
+  final String _noteCategory = noteCategories.keys.firstWhere((key) => key == "Random");
 
   Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
     final widgetNote = context.getArgument<CloudNote>();
