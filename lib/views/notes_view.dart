@@ -10,6 +10,7 @@ import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
 import 'package:mynotes/utilities/widgets/custom_floating_action_button.dart';
+import 'package:mynotes/utilities/widgets/custom_note_view_app_bar.dart';
 import 'package:mynotes/utilities/widgets/custom_tabbar_indicator.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
 import 'package:group_list_view/group_list_view.dart';
