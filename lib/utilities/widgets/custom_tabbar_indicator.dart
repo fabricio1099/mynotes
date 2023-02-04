@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class RRectTabIndicator extends Decoration {
+class CustomTabIndicator extends Decoration {
   final BoxPainter _painter;
 
-  RRectTabIndicator({
+  CustomTabIndicator({
     required Color color,
     required double radius,
     required double rectangleWidth,

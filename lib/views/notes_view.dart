@@ -3,13 +3,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mynotes/constants/colors.dart';
+import 'package:mynotes/constants/home_page_tabs.dart';
 import 'package:mynotes/constants/note_categories.dart';
 import 'package:mynotes/models/note.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
-import 'package:mynotes/utilities/widgets/rounded_rectangle_tabbar_indicator.dart';
-import 'package:mynotes/views/categories_view.dart';
+import 'package:mynotes/utilities/widgets/custom_floating_action_button.dart';
+import 'package:mynotes/utilities/widgets/custom_tabbar_indicator.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
 import 'package:group_list_view/group_list_view.dart';
 import 'package:mynotes/views/notes/profile_view.dart';
@@ -52,30 +53,19 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Widget buildFloatingActionButton() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15.0, right: 8),
-      child: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(CreateUpdateNoteView.routeName);
-        },
-        child: const Icon(
-          FontAwesomeIcons.penToSquare,
-          size: 18,
-        ),
-        backgroundColor: const Color(lightBlueHex),
-        mini: false,
-        tooltip: 'Add a new note',
-      ),
-    );
+  void openNewNoteScreen() {
+    Navigator.of(context).pushNamed(CreateUpdateNoteView.routeName);
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: buildFloatingActionButton(),
-        appBar: buildAppBar(),
+        floatingActionButton: CustomFloatingActionButton(
+          context: context,
+          onPressed: openNewNoteScreen,
+        ),
+        appBar: CustomNoteViewAppBar(context: context),
         body: StreamBuilder(
           stream: _notesService.allNotes(ownerUserId: userId),
           builder: (context, snapshot) {
@@ -84,14 +74,16 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
               case ConnectionState.active:
                 if (snapshot.hasData) {
                   final allNotes = snapshot.data as Iterable<CloudNote>;
-                  final DateFormat formatter = DateFormat('dd/MM/yyyy');
+                  final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
 
                   SplayTreeMap<String, List<CloudNote>>
                       allNotesMappedByModifiedDate =
                       SplayTreeMap<String, List<CloudNote>>();
+
+                  //build notes map by modified date
                   for (var note in allNotes.toList()) {
                     final String modifiedDateFormatted =
-                        formatter.format(note.modifiedDate!.toDate());
+                        dateFormatter.format(note.modifiedDate!.toDate());
                     if (!allNotesMappedByModifiedDate
                         .containsKey(modifiedDateFormatted)) {
                       allNotesMappedByModifiedDate[modifiedDateFormatted] = [
@@ -102,21 +94,23 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                           .add(note);
                     }
                   }
+
+                  //sort mapped notes by modified date desc
                   allNotesMappedByModifiedDate = SplayTreeMap.from(
                     allNotesMappedByModifiedDate,
                     (key1, key2) {
-                      final date1 = formatter.parse(key1);
-                      final date2 = formatter.parse(key2);
+                      final date1 = dateFormatter.parse(key1);
+                      final date2 = dateFormatter.parse(key2);
                       return date2.compareTo(date1);
                     },
                   );
 
-                  final allNotesSortedByModifiedDate = allNotes.toList();
-                  allNotesSortedByModifiedDate.sort(
-                    (note1, note2) {
-                      return note1.modifiedDate!.compareTo(note2.modifiedDate!);
-                    },
-                  );
+                  // final allNotesSortedByModifiedDate = allNotes.toList();
+                  // allNotesSortedByModifiedDate.sort(
+                  //   (note1, note2) {
+                  //     return note1.modifiedDate!.compareTo(note2.modifiedDate!);
+                  //   },
+                  // );
 
                   final pinnedNotes =
                       allNotes.where((note) => note.isPinned).toList();
@@ -141,7 +135,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                             itemCount: pinnedNotes.length,
                             itemBuilder: (context, itemIndex, pageViewIndex) {
                               final note = pinnedNotes.elementAt(itemIndex);
-                              return Container(
+                              return Container( //TODO: extract to CustomPinnedDate widget
                                 decoration: BoxDecoration(
                                   color: const Color(veryPaleBlueHex),
                                   borderRadius: BorderRadius.circular(8),
@@ -218,39 +212,14 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                           isScrollable: true,
                           labelColor: Colors.black,
                           unselectedLabelColor: Colors.grey,
-                          indicator: RRectTabIndicator(
+                          indicator: CustomTabIndicator(
                             color: const Color(lightBlueHex),
                             radius: 3,
                             rectangleWidth: 40,
                             rectangleHeight: 3,
                             verticalOffset: 8,
                           ),
-                          tabs: const [
-                            Tab(
-                              child: Text(
-                                'Recent',
-                                style: TextStyle(
-                                  fontSize: 19,
-                                ),
-                              ),
-                            ),
-                            Tab(
-                              child: Text(
-                                'Favourites',
-                                style: TextStyle(
-                                  fontSize: 19,
-                                ),
-                              ),
-                            ),
-                            Tab(
-                              child: Text(
-                                'Shared With Me',
-                                style: TextStyle(
-                                  fontSize: 19,
-                                ),
-                              ),
-                            ),
-                          ],
+                          tabs: homePageTabs,
                         ),
                         const SizedBox(height: 20),
                         Expanded(
@@ -267,7 +236,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                         .compareTo(note1.modifiedDate!);
                                   });
                                   final note = sortedValues[index.index];
-                                  return GestureDetector(
+                                  return GestureDetector( //TODO: extract to CustomNoteItem widget
                                     onTap: () {
                                       Navigator.of(context).pushNamed(
                                         CreateUpdateNoteView.routeName,
@@ -289,7 +258,8 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                           stops: const [0.02, 0.02],
                                           colors: [
                                             Color(
-                                              noteCategories[note.category]!,
+                                              noteCategories[note.category]![
+                                                  'colorHex'] as int,
                                             ),
                                             Colors.white,
                                           ],
@@ -332,7 +302,8 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                               ),
                                               backgroundColor: Color(
                                                   noteCategories[
-                                                      note.category]!),
+                                                          note.category]![
+                                                      'colorHex'] as int),
                                               label: Text(note.category),
                                             ),
                                           ),
@@ -345,11 +316,13 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                                     .toList()
                                     .length,
                                 groupHeaderBuilder: ((context, section) {
+                                  //TODO: reactor date formating
                                   String date = allNotesMappedByModifiedDate
                                       .keys
                                       .toList()[section];
 
-                                  DateTime dateToCheck = formatter.parse(date);
+                                  DateTime dateToCheck =
+                                      dateFormatter.parse(date);
                                   dateToCheck = DateTime(
                                     dateToCheck.year,
                                     dateToCheck.month,
@@ -416,57 +389,6 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
                 return const CircularProgressIndicator();
             }
           },
-        ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget buildAppBar() {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(100),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 20),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Expanded(
-              child: SizedBox(
-                height: 35,
-                child: TextField(
-                  textAlignVertical: TextAlignVertical.center,
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                    isCollapsed: true,
-                    prefixIcon: Icon(
-                      Icons.search,
-                    ),
-                    hintText: 'Search notes',
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xFFE0C8FF),
-                        width: 0.5,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 15),
-            GestureDetector(
-              onTap: (() {
-                Navigator.of(context).pushNamed(ProfileView.routeName);
-              }),
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage: Image.asset('assets/icon/avatar-80.png').image,
-                backgroundColor: const Color(veryPaleBlueHex),
-              ),
-            ),
-          ],
         ),
       ),
     );
