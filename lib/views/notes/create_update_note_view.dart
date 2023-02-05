@@ -74,7 +74,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         isPinned: _isPinned,
         isFavourite: _isFavourite,
         createdDate: note.createdDate,
-        modifiedDate: note.modifiedDate,
+        modifiedDate: Timestamp.now(),
         pinnedDate: _pinnedDate,
         favouriteDate: _favouriteDate,
         category: _noteCategory,
