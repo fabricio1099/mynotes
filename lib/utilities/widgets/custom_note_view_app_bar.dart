@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mynotes/constants/app_bar_constants.dart';
 import 'package:mynotes/constants/colors.dart';
 import 'package:mynotes/views/notes/profile_view.dart';
 
@@ -64,5 +65,5 @@ class CustomNoteViewAppBar extends StatelessWidget implements PreferredSizeWidge
   }
   
   @override
-  Size get preferredSize => const Size.fromHeight(100);
+  Size get preferredSize => const Size.fromHeight(kAppBarHeight);
 }

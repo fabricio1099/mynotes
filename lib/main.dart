@@ -11,7 +11,6 @@ import 'package:mynotes/views/login_view.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
 import 'package:mynotes/views/home_view.dart';
 import 'package:mynotes/views/notes/profile_view.dart';
-import 'package:mynotes/views/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
 import 'views/verify_email_view.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';

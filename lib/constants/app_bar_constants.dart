@@ -1,1 +1,1 @@
-double kAppBarHeight = 55;
+const double kAppBarHeight = 100;

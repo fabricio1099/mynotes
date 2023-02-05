@@ -17,8 +17,12 @@ class _HomeState extends State<Home> {
   static const List<Widget> _pages = [
     NotesView(),
     Categories(),
-    Text('record'),
-    Text('settings'),
+    Placeholder(
+      child: Center(child: Text('records')),
+    ),
+    Placeholder(
+      child: Center(child: Text('settings')),
+    ),
   ];
 
   static const List<BottomNavigationBarItem> _navigationItems = [
