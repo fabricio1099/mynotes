@@ -28,6 +28,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   Timestamp? _pinnedDate;
   Timestamp? _favouriteDate;
   final String _noteCategory = noteCategories.keys.firstWhere((key) => key == "Random");
+  bool _wasNoteUpdated = false;
 
   Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
     final widgetNote = context.getArgument<CloudNote>();
@@ -93,6 +94,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         favouriteDate: _favouriteDate,
         category: _noteCategory,
       );
+
+      _wasNoteUpdated = true;
     }
   }
 
@@ -114,6 +117,10 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const BackButtonIcon(),
+          onPressed: () => Navigator.of(context).pop({'note': _note, 'updated': _wasNoteUpdated}),
+        ),
         iconTheme: const IconThemeData(
           color: Colors.black,
           size: 17,

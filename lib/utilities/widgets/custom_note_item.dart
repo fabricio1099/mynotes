@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mynotes/constants/note_categories.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
+import 'package:mynotes/views/notes/note_view.dart';
 
 class CustomNoteItem extends StatelessWidget {
   const CustomNoteItem({
@@ -16,7 +17,7 @@ class CustomNoteItem extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(
-          CreateUpdateNoteView.routeName,
+          NoteView.routeName,
           arguments: note,
         );
       },
