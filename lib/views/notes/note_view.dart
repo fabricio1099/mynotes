@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mynotes/constants/date_formatter.dart';
+import 'package:mynotes/constants/note_categories.dart';
 import 'package:mynotes/utilities/generics/get_arguments.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/utilities/widgets/custom_floating_action_button.dart';
@@ -18,28 +21,7 @@ class _NoteViewState extends State<NoteView> {
   CloudNote? _note;
   bool _wasNoteUpdated = false;
   CloudNote? _updatedNote;
-
-  Future<void> getExistingNote(BuildContext context) async {
-    final widgetNote = context.getArgument<CloudNote>();
-
-    // if (widgetNote != null) {
-    _note = widgetNote;
-    // return widgetNote;
-    // }
-
-    // final currentUser = AuthService.firebase().currentUser!;
-    // final newNote = CloudNote(
-    //   documentId: CloudNote.initialNoteDocumentId,
-    //   ownerUserId: currentUser.id,
-    //   text: '',
-    //   title: '',
-    //   createdDate: Timestamp.now(),
-    //   modifiedDate: Timestamp.now(),
-    //   category: _noteCategory,
-    // );
-    // _note = newNote;
-    // return newNote;
-  }
+  final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
 
   void _openUpdateNoteScreen() {
     Navigator.of(context)
@@ -58,7 +40,6 @@ class _NoteViewState extends State<NoteView> {
     );
   }
 
-  // @override
   @override
   Widget build(BuildContext context) {
     if (!_wasNoteUpdated) {
@@ -66,11 +47,13 @@ class _NoteViewState extends State<NoteView> {
       _note = widgetNote;
     }
     return Scaffold(
+      key: _scaffoldkey,
       floatingActionButton: CustomFloatingActionButton(
         context: context,
         onPressed: _openUpdateNoteScreen,
       ),
       appBar: AppBar(
+        leadingWidth: 40,
         iconTheme: const IconThemeData(
           color: Colors.black,
           size: 17,
@@ -84,31 +67,113 @@ class _NoteViewState extends State<NoteView> {
           )
         ],
       ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.grey.shade200,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(
+              onPressed: () {
+                _scaffoldkey.currentState?.showBottomSheet((context) {
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: constraints.maxHeight/3,
+                        child: Column(
+                          children: const [
+                            Text('TODO later'),
+                            Text('TEST'),
+                            Text('TEST'),
+                            Text('TEST'),
+                            Text('TEST'),
+                            Text('TEST'),
+                            Text('TEST'),
+                          ],
+                        ),
+                      );
+                    }
+                  );
+                });
+              },
+              icon: const Icon(FontAwesomeIcons.fileImport),
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                FontAwesomeIcons.microphone,
+              ),
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(FontAwesomeIcons.shareNodes),
+            ),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          child:
-              // Builder(
-              //   // future: getExistingNote(context),
-              //   builder: (context) {
-              //         // final text = _textController.text;
-              //         // final title = _titleController.text;
-              //         // if (_note != null) {
-              //           // final note = _note;
-              //           return
-              Column(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_note!.title),
-              Text(_note!.text),
+              Row(
+                children: [
+                  const Icon(FontAwesomeIcons.paste),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${_note!.category} Notes',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                _note!.title,
+                textAlign: TextAlign.start,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                niceDateFormatter.format(_note!.modifiedDate!.toDate()),
+                textAlign: TextAlign.start,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 10,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Container(
+                      height: 55,
+                      width: 4,
+                      // margin: const EdgeInsets.symmetric(horizontal: 5),
+                      decoration: BoxDecoration(
+                        color: Color(
+                          noteCategories[_note!.category]!['colorHex'] as int,
+                        ),
+                        borderRadius: const BorderRadius.horizontal(
+                          right: Radius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(child: Text(_note!.text)),
+                ],
+              ),
             ],
           ),
-          // } else {
-          //   return const Center(
-          //       child: Text("an error occured : couldn't load note"));
-          // }
-
-          //   },
-          // ),
         ),
       ),
     );

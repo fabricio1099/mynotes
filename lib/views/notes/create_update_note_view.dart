@@ -89,7 +89,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         isPinned: _isPinned,
         isFavourite: _isFavourite,
         createdDate: note.createdDate,
-        modifiedDate: note.modifiedDate,
+        modifiedDate: Timestamp.now(),
         pinnedDate: _pinnedDate,
         favouriteDate: _favouriteDate,
         category: _noteCategory,
@@ -117,6 +117,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leadingWidth: 40,
         leading: IconButton(
           icon: const BackButtonIcon(),
           onPressed: () => Navigator.of(context).pop({'note': _note, 'updated': _wasNoteUpdated}),

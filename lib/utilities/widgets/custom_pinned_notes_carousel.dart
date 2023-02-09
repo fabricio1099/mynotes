@@ -17,7 +17,7 @@ class CustomPinnedNotesCarousel extends StatelessWidget {
       itemCount: pinnedNotes.length,
       itemBuilder: (context, itemIndex, pageViewIndex) {
         final note = pinnedNotes.elementAt(itemIndex);
-        return CustomPinnedDateItem(note: note);
+        return CustomPinnedNoteItem(note: note);
       },
       options: CarouselOptions(
         autoPlay: false,

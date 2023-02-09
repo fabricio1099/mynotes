@@ -1,6 +1,6 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:mynotes/constants/date_formatter.dart';
 import 'package:mynotes/models/note.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
@@ -32,8 +32,6 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
   String get userId => AuthService.firebase().currentUser!.id;
 
   late final TabController _tabController;
-
-  final DateFormat _dateFormatter = DateFormat('dd/MM/yyyy');
 
   @override
   void initState() {
@@ -188,7 +186,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
       int section) {
     String dateToDisplay = allNotesMappedByModifiedDate.keys.toList()[section];
 
-    DateTime dateToCheck = _dateFormatter.parse(dateToDisplay);
+    DateTime dateToCheck = dateFormatter.parse(dateToDisplay);
 
     final DateTime now = DateTime.now();
     final DateTime today = DateTime(
@@ -217,8 +215,8 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
     allNotesMappedByModifiedDate = SplayTreeMap.from(
       allNotesMappedByModifiedDate,
       (key1, key2) {
-        final date1 = _dateFormatter.parse(key1);
-        final date2 = _dateFormatter.parse(key2);
+        final date1 = dateFormatter.parse(key1);
+        final date2 = dateFormatter.parse(key2);
         return date2.compareTo(date1);
       },
     );
@@ -231,7 +229,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
   ) {
     for (var note in allNotes.toList()) {
       final String modifiedDateFormatted =
-          _dateFormatter.format(note.modifiedDate!.toDate());
+          dateFormatter.format(note.modifiedDate!.toDate());
       if (!allNotesMappedByModifiedDate.containsKey(modifiedDateFormatted)) {
         allNotesMappedByModifiedDate[modifiedDateFormatted] = [note];
       } else {
