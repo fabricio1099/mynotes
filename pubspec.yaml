@@ -87,6 +87,7 @@ flutter:
     - assets/icon/icon-open-envelope-100.png
     - assets/icon/avatar-100.png
     - assets/icon/avatar-80.png
+    - assets/image/empty.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mynotes/constants/date_formatter.dart';
 import 'package:mynotes/constants/note_categories.dart';
@@ -9,7 +8,7 @@ import 'package:mynotes/utilities/widgets/custom_floating_action_button.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
 
 class NoteView extends StatefulWidget {
-  static const routeName = '/open-note';
+  static const routeName = '/view-note';
 
   const NoteView({Key? key}) : super(key: key);
 
@@ -43,8 +42,7 @@ class _NoteViewState extends State<NoteView> {
   @override
   Widget build(BuildContext context) {
     if (!_wasNoteUpdated) {
-      final widgetNote = context.getArgument<CloudNote>();
-      _note = widgetNote;
+      _note = context.getArgument<CloudNote>();
     }
     return Scaffold(
       key: _scaffoldkey,
@@ -112,67 +110,69 @@ class _NoteViewState extends State<NoteView> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(FontAwesomeIcons.paste),
-                  const SizedBox(width: 10),
-                  Text(
-                    '${_note!.category} Notes',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(noteCategories[_note!.category]!['icon'] as IconData),
+                    const SizedBox(width: 10),
+                    Text(
+                      '${_note!.category} Notes',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  _note!.title,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Text(
-                _note!.title,
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 25,
                 ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                niceDateFormatter.format(_note!.modifiedDate!.toDate()),
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 10,
-                  color: Colors.black54,
+                const SizedBox(height: 5),
+                Text(
+                  niceDateFormatter.format(_note!.modifiedDate!.toDate()),
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 10,
+                    color: Colors.black54,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: Container(
-                      height: 55,
-                      width: 4,
-                      // margin: const EdgeInsets.symmetric(horizontal: 5),
-                      decoration: BoxDecoration(
-                        color: Color(
-                          noteCategories[_note!.category]!['colorHex'] as int,
-                        ),
-                        borderRadius: const BorderRadius.horizontal(
-                          right: Radius.circular(8),
+                const SizedBox(height: 20),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: Container(
+                        height: 55,
+                        width: 4,
+                        // margin: const EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          color: Color(
+                            noteCategories[_note!.category]!['colorHex'] as int,
+                          ),
+                          borderRadius: const BorderRadius.horizontal(
+                            right: Radius.circular(8),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(child: Text(_note!.text)),
-                ],
-              ),
-            ],
+                    Expanded(child: Text(_note!.text)),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/constants/note_categories.dart';
-import 'package:mynotes/utilities/widgets/custom_category.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:mynotes/services/cloud/cloud_note.dart';
+import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
+import 'package:mynotes/utilities/widgets/custom_category_item.dart';
 import 'package:mynotes/utilities/widgets/custom_floating_action_button.dart';
+import 'package:mynotes/views/category_view.dart';
 
-class Categories extends StatelessWidget {
+class Categories extends StatefulWidget {
   const Categories({super.key});
+
+  @override
+  State<Categories> createState() => _CategoriesState();
+}
+
+class _CategoriesState extends State<Categories> {
+  late final FirebaseCloudStorageService _notesService;
+  String get userId => AuthService.firebase().currentUser!.id;
+
+  @override
+  void initState() {
+    _notesService = FirebaseCloudStorageService();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +66,42 @@ class Categories extends StatelessWidget {
                           final category = noteCategories.keys.elementAt(index);
                           final categoryColor =
                               noteCategories[category]!['colorHex'] as int;
-                          return CustomCategory(
-                              categoryColor: categoryColor, category: category);
+                          return StreamBuilder<Object>(
+                            stream: _notesService.allNotes(ownerUserId: userId),
+                            builder: (context, snapshot) {
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.waiting:
+                                case ConnectionState.active:
+                                  if (snapshot.hasData) {
+                                    final allNotes =
+                                        snapshot.data as Iterable<CloudNote>;
+                                    final noteCategoryCount = allNotes
+                                        .toList()
+                                        .where(
+                                          (note) => note.category == category,
+                                        )
+                                        .length;
+                                    return GestureDetector(
+                                      onTap: (() {
+                                        Navigator.of(context).pushNamed(
+                                          CategoryView.routeName,
+                                          arguments: category,
+                                        );
+                                      }),
+                                      child: CustomCategoryItem(
+                                        categoryColor: categoryColor,
+                                        category: category,
+                                        noteCount: noteCategoryCount,
+                                      ),
+                                    );
+                                  } else {
+                                    return const CircularProgressIndicator();
+                                  }
+                                default:
+                                  return const CircularProgressIndicator();
+                              }
+                            },
+                          );
                         },
                       ),
                     ),
@@ -64,6 +116,6 @@ class Categories extends StatelessWidget {
   }
 
   void openNewCategoryDialog() {
-    print("new category dialog");//TODO: add new category, store and retrieve it
+    print("new category dialog"); //TODO: add new category, store and retrieve it
   }
 }

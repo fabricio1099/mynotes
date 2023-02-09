@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/constants/note_categories.dart';
 
-class CustomCategory extends StatelessWidget {
-  const CustomCategory({
+class CustomCategoryItem extends StatelessWidget {
+  const CustomCategoryItem({
     Key? key,
     required this.categoryColor,
     required this.category,
+    required this.noteCount,
   }) : super(key: key);
 
   final int categoryColor;
   final String category;
+  final int noteCount;
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +40,9 @@ class CustomCategory extends StatelessWidget {
               ),
             ),
           ),
-          const Text(
-            '5 files', // TODO: display real count of notes for specific category
-            style: TextStyle(
+          Text(
+            noteCount > 1 ? '$noteCount files' : '$noteCount file',
+            style: const TextStyle(
               fontSize: 11,
             ),
           ),

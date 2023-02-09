@@ -7,9 +7,11 @@ class CustomNoteItem extends StatelessWidget {
   const CustomNoteItem({
     Key? key,
     required this.note,
+    this.displayCategoryChip = true,
   }) : super(key: key);
 
   final CloudNote note;
+  final bool displayCategoryChip;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +67,7 @@ class CustomNoteItem extends StatelessWidget {
             const SizedBox(
               width: 25,
             ),
-            Padding(
+            if (displayCategoryChip) Padding(
               padding: const EdgeInsets.only(
                 right: 30,
               ),
