@@ -115,6 +115,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
 
   @override
   Widget build(BuildContext context) {
+    final String? newNoteCategory = context.getArgument<String>();
+    print(newNoteCategory);
+    
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 40,
@@ -146,48 +149,50 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: FutureBuilder(
-            future: createOrGetExistingNote(context),
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.done:
-                  final text = _textController.text;
-                  final title = _titleController.text;
-                  // _setupNoteControllerListener();
-                  return Column(
-                    children: [
-                      TextField(
-                        controller: _titleController,
-                        autofocus: text.isEmpty && title.isEmpty,
-                        style: const TextStyle(
-                          fontSize: 25,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: FutureBuilder(
+              future: createOrGetExistingNote(context),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                    final text = _textController.text;
+                    final title = _titleController.text;
+                    // _setupNoteControllerListener();
+                    return Column(
+                      children: [
+                        TextField(
+                          controller: _titleController,
+                          autofocus: text.isEmpty && title.isEmpty,
+                          style: const TextStyle(
+                            fontSize: 25,
+                          ),
+                          decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Title',
+                              hintStyle: TextStyle(
+                                fontSize: 25,
+                              )),
                         ),
-                        decoration: const InputDecoration(
+                        TextField(
+                          controller: _textController,
+                          autofocus: text.isNotEmpty,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'Title',
-                            hintStyle: TextStyle(
-                              fontSize: 25,
-                            )),
-                      ),
-                      TextField(
-                        controller: _textController,
-                        autofocus: text.isNotEmpty,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Note',
+                            hintText: 'Note',
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                default:
-                  return const CircularProgressIndicator();
-              }
-            },
+                      ],
+                    );
+                  default:
+                    return const CircularProgressIndicator();
+                }
+              },
+            ),
           ),
         ),
       ),

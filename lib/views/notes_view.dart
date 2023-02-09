@@ -50,7 +50,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void openNewNoteScreen() {
+  void _openNewNoteScreen() {
     Navigator.of(context).pushNamed(CreateUpdateNoteView.routeName);
   }
 
@@ -60,7 +60,7 @@ class _NotesViewState extends State<NotesView> with TickerProviderStateMixin {
       child: Scaffold(
         floatingActionButton: CustomFloatingActionButton(
           context: context,
-          onPressed: openNewNoteScreen,
+          onPressed: _openNewNoteScreen,
         ),
         appBar: CustomNoteViewAppBar(context: context),
         body: StreamBuilder(
