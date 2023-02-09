@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/constants/note_categories.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
-import 'package:mynotes/views/notes/create_update_note_view.dart';
+import 'package:mynotes/views/notes/note_view.dart';
 
 class CustomNoteItem extends StatelessWidget {
   const CustomNoteItem({
@@ -16,7 +16,7 @@ class CustomNoteItem extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(
-          CreateUpdateNoteView.routeName,
+          NoteView.routeName,
           arguments: note,
         );
       },
@@ -35,18 +35,17 @@ class CustomNoteItem extends StatelessWidget {
             stops: const [0.02, 0.02],
             colors: [
               Color(
-                noteCategories[note.category]![
-                    'colorHex'] as int,
+                noteCategories[note.category]!['colorHex'] as int,
               ),
               Colors.white,
             ],
           ),
           borderRadius: const BorderRadius.all(
-              Radius.circular(8)),
+            Radius.circular(8),
+          ),
         ),
         child: Row(
-          crossAxisAlignment:
-              CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: ListTile(
@@ -71,16 +70,13 @@ class CustomNoteItem extends StatelessWidget {
                 right: 30,
               ),
               child: Chip(
-                shape:
-                    const RoundedRectangleBorder(
+                shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(
                     Radius.circular(8),
                   ),
                 ),
-                backgroundColor: Color(
-                    noteCategories[
-                            note.category]![
-                        'colorHex'] as int),
+                backgroundColor:
+                    Color(noteCategories[note.category]!['colorHex'] as int),
                 label: Text(note.category),
               ),
             ),
