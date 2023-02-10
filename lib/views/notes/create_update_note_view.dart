@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mynotes/constants/date_formatter.dart';
 import 'package:mynotes/constants/note_categories.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
-import 'package:mynotes/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:mynotes/utilities/generics/get_arguments.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
-import 'package:share_plus/share_plus.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
   static const routeName = '/create-update-note';
@@ -27,7 +27,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   bool _isFavourite = false;
   Timestamp? _pinnedDate;
   Timestamp? _favouriteDate;
-  final String _noteCategory = noteCategories.keys.firstWhere((key) => key == "Random");
+  String _selectedNoteCategory =
+      noteCategories.keys.firstWhere((key) => key == "Random");
   bool _wasNoteUpdated = false;
 
   Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
@@ -55,7 +56,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       title: '',
       createdDate: Timestamp.now(),
       modifiedDate: Timestamp.now(),
-      category: _noteCategory,
+      category: _selectedNoteCategory,
     );
     _note = newNote;
     return newNote;
@@ -78,7 +79,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         modifiedDate: Timestamp.now(),
         pinnedDate: _pinnedDate,
         favouriteDate: _favouriteDate,
-        category: _noteCategory,
+        category: _selectedNoteCategory,
       );
 
       _note = CloudNote(
@@ -92,7 +93,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         modifiedDate: Timestamp.now(),
         pinnedDate: _pinnedDate,
         favouriteDate: _favouriteDate,
-        category: _noteCategory,
+        category: _selectedNoteCategory,
       );
 
       _wasNoteUpdated = true;
@@ -116,14 +117,15 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   @override
   Widget build(BuildContext context) {
     final String? newNoteCategory = context.getArgument<String>();
-    print(newNoteCategory);
-    
+    _selectedNoteCategory = newNoteCategory ?? _selectedNoteCategory;
+
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 40,
         leading: IconButton(
           icon: const BackButtonIcon(),
-          onPressed: () => Navigator.of(context).pop({'note': _note, 'updated': _wasNoteUpdated}),
+          onPressed: () => Navigator.of(context)
+              .pop({'note': _note, 'updated': _wasNoteUpdated}),
         ),
         iconTheme: const IconThemeData(
           color: Colors.black,
@@ -136,17 +138,6 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
             onPressed: _saveNoteIfTextOrTitleNotEmpty,
             icon: const Icon(FontAwesomeIcons.check),
           ),
-          IconButton(
-            onPressed: () async {
-              final text = _textController.text;
-              if (_note == null || text.isEmpty) {
-                await showCannotShareEmptyNoteDialog(context);
-              } else {
-                Share.share(text);
-              }
-            },
-            icon: const Icon(Icons.share),
-          )
         ],
       ),
       body: SafeArea(
@@ -158,33 +149,109 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
-                    final text = _textController.text;
-                    final title = _titleController.text;
-                    // _setupNoteControllerListener();
                     return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          children: [
+                            Icon(
+                              noteCategories[_note!.category]!['icon']
+                                  as IconData,
+                            ),
+                            const SizedBox(width: 10),
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton2(
+                                items: noteCategories.keys
+                                    .map(
+                                      (category) => DropdownMenuItem<String>(
+                                        value: category,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              '$category Notes',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: _selectedNoteCategory,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedNoteCategory = value as String;
+                                  });
+                                },
+                                isDense: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
                         TextField(
                           controller: _titleController,
-                          autofocus: text.isEmpty && title.isEmpty,
+                          // autofocus: text.isEmpty && title.isEmpty,
                           style: const TextStyle(
+                            fontWeight: FontWeight.bold,
                             fontSize: 25,
                           ),
                           decoration: const InputDecoration(
+                              isCollapsed: true,
                               border: InputBorder.none,
                               hintText: 'Title',
                               hintStyle: TextStyle(
                                 fontSize: 25,
                               )),
                         ),
-                        TextField(
-                          controller: _textController,
-                          autofocus: text.isNotEmpty,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: null,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Note',
+                        // const SizedBox(height: 5),
+                        Text(
+                          niceDateFormatter
+                              .format(_note!.modifiedDate!.toDate()),
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 10,
+                            color: Colors.black54,
                           ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: Container(
+                                height: 55,
+                                width: 4,
+                                // margin: const EdgeInsets.symmetric(horizontal: 5),
+                                decoration: BoxDecoration(
+                                  color: Color(
+                                    noteCategories[_selectedNoteCategory]![
+                                        'colorHex'] as int,
+                                  ),
+                                  borderRadius: const BorderRadius.horizontal(
+                                    right: Radius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: _textController,
+                                // autofocus: text.isNotEmpty,
+                                keyboardType: TextInputType.multiline,
+                                maxLines: null,
+                                style: const TextStyle(fontSize: 15),
+                                decoration: const InputDecoration(
+                                  isCollapsed: true,
+                                  border: InputBorder.none,
+                                  hintText: 'Note',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     );
