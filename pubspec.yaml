@@ -54,6 +54,7 @@ dependencies:
   group_list_view: ^1.1.1
   font_awesome_flutter: ^10.2.1
   google_fonts: ^3.0.1
+  dropdown_button2: ^1.9.2
 
 dev_dependencies:
   flutter_test:

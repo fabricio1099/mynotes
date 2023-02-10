@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mynotes/constants/date_formatter.dart';
 import 'package:mynotes/constants/note_categories.dart';
+import 'package:mynotes/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:mynotes/utilities/generics/get_arguments.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/utilities/widgets/custom_floating_action_button.dart';
 import 'package:mynotes/views/notes/create_update_note_view.dart';
+import 'package:share_plus/share_plus.dart';
 
 class NoteView extends StatefulWidget {
   static const routeName = '/view-note';
@@ -70,41 +72,25 @@ class _NoteViewState extends State<NoteView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            IconButton(
-              onPressed: () {
-                _scaffoldkey.currentState?.showBottomSheet((context) {
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Container(
-                        color: Colors.white,
-                        width: double.infinity,
-                        height: constraints.maxHeight/3,
-                        child: Column(
-                          children: const [
-                            Text('TODO later'),
-                            Text('TEST'),
-                            Text('TEST'),
-                            Text('TEST'),
-                            Text('TEST'),
-                            Text('TEST'),
-                            Text('TEST'),
-                          ],
-                        ),
-                      );
-                    }
-                  );
-                });
-              },
-              icon: const Icon(FontAwesomeIcons.fileImport),
+            const IconButton(
+              onPressed: null, // TODO: open bottomSheet with options
+              icon: Icon(FontAwesomeIcons.fileImport),
             ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
+            const IconButton(
+              onPressed: null, // TODO: open dialog to record a note
+              icon: Icon(
                 FontAwesomeIcons.microphone,
               ),
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () async {
+              final text = _note!.text;
+              if (_note == null || text.isEmpty) {
+                await showCannotShareEmptyNoteDialog(context);
+              } else {
+                Share.share(text);
+              }
+            },
               icon: const Icon(FontAwesomeIcons.shareNodes),
             ),
           ],
@@ -168,7 +154,12 @@ class _NoteViewState extends State<NoteView> {
                         ),
                       ),
                     ),
-                    Expanded(child: Text(_note!.text)),
+                    Expanded(
+                      child: Text(
+                        _note!.text,
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ),
                   ],
                 ),
               ],

@@ -16,6 +16,9 @@ class CustomNoteItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onLongPress: () {
+        print('hey'); //TODO delete note
+      },
       onTap: () {
         Navigator.of(context).pushNamed(
           NoteView.routeName,
@@ -67,21 +70,22 @@ class CustomNoteItem extends StatelessWidget {
             const SizedBox(
               width: 25,
             ),
-            if (displayCategoryChip) Padding(
-              padding: const EdgeInsets.only(
-                right: 30,
-              ),
-              child: Chip(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(8),
-                  ),
+            if (displayCategoryChip)
+              Padding(
+                padding: const EdgeInsets.only(
+                  right: 30,
                 ),
-                backgroundColor:
-                    Color(noteCategories[note.category]!['colorHex'] as int),
-                label: Text(note.category),
+                child: Chip(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8),
+                    ),
+                  ),
+                  backgroundColor:
+                      Color(noteCategories[note.category]!['colorHex'] as int),
+                  label: Text(note.category),
+                ),
               ),
-            ),
           ],
         ),
       ),

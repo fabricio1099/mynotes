@@ -27,7 +27,13 @@ void main() {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        textTheme: GoogleFonts.nunitoTextTheme(),
+        textTheme: GoogleFonts.nunitoSansTextTheme(
+          // const TextTheme(
+          //   bodyLarge: TextStyle(fontSize: 10.0),
+          //   bodyMedium: TextStyle(fontSize: 10.0),
+          //   bodySmall: TextStyle(fontSize: 10.0),
+          // ),
+        ),
       ),
       home: BlocProvider<AuthBloc>(
         create: (context) => AuthBloc(FirebaseAuthProvider()),
