@@ -8,6 +8,7 @@ import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/utilities/generics/get_arguments.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
+import 'package:mynotes/utilities/logger.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
   static const routeName = '/create-update-note';
@@ -66,37 +67,66 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final note = _note;
     final text = _textController.text;
     final title = _titleController.text;
-    if (note != null && (text.isNotEmpty || title.isNotEmpty)) {
-      final currentUser = AuthService.firebase().currentUser!;
-      final String documentId = await _notesService.saveNote(
-        ownerUserId: currentUser.id,
-        documentId: note.documentId,
-        text: text,
-        title: title,
-        isPinned: _isPinned,
-        isFavourite: _isFavourite,
-        createdDate: note.createdDate,
-        modifiedDate: Timestamp.now(),
-        pinnedDate: _pinnedDate,
-        favouriteDate: _favouriteDate,
-        category: _selectedNoteCategory,
-      );
 
-      _note = CloudNote(
-        documentId: documentId,
-        ownerUserId: currentUser.id,
-        text: _textController.text,
-        title: _titleController.text,
-        isPinned: _isPinned,
-        isFavourite: _isFavourite,
-        createdDate: note.createdDate,
-        modifiedDate: Timestamp.now(),
-        pinnedDate: _pinnedDate,
-        favouriteDate: _favouriteDate,
-        category: _selectedNoteCategory,
-      );
+    try {
+      if (note != null && (text.isNotEmpty || title.isNotEmpty)) {
+            final currentUser = AuthService.firebase().currentUser!;
+            final String documentId = await _notesService.saveNote(
+              ownerUserId: currentUser.id,
+              documentId: note.documentId,
+              text: text,
+              title: title,
+              isPinned: _isPinned,
+              isFavourite: _isFavourite,
+              createdDate: note.createdDate,
+              modifiedDate: Timestamp.now(),
+              pinnedDate: _pinnedDate,
+              favouriteDate: _favouriteDate,
+              category: _selectedNoteCategory,
+            );
 
-      _wasNoteUpdated = true;
+            _note = CloudNote(
+              documentId: documentId,
+              ownerUserId: currentUser.id,
+              text: _textController.text,
+              title: _titleController.text,
+              isPinned: _isPinned,
+              isFavourite: _isFavourite,
+              createdDate: note.createdDate,
+              modifiedDate: Timestamp.now(),
+              pinnedDate: _pinnedDate,
+              favouriteDate: _favouriteDate,
+              category: _selectedNoteCategory,
+            );
+
+            _wasNoteUpdated = true;
+
+            log.d("The note has been saved");
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                backgroundColor: Colors.greenAccent,
+                content: Text(
+                  'The note has been saved!',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            );
+          }
+    } catch (e) {
+      log.d("An error occurred while saving the note");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text(
+            'The note has not been saved!',
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
+      );
     }
   }
 
